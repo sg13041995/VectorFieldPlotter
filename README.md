@@ -16,4 +16,4 @@ Inspiration, code snippets, etc.
 * [3Blue1Brown | Youtube](https://www.youtube.com/c/3blue1brown)
 * [p5js.org](https://p5js.org/)
 * [khanacademy.org](https://www.khanacademy.org/)
-* [Khan Academy](https://www.youtube.com/c/khanacademy)
+* [Khan Academy | Youtube](https://www.youtube.com/c/khanacademy)
