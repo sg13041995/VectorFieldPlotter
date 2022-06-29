@@ -6,7 +6,7 @@ This application can plot vector field functions and it can also calculate diffe
 
 Contributors names and contact info
 
-* Subhankar Ghosh  
+* Subhankar Ghosh || subhankar.130495@gmail.com
 
 ## Acknowledgments
 
