@@ -4,13 +4,10 @@ This application can plot vector field functions and it can also calculate diffe
 
 ## Authors
 
-Contributors names and contact info
-
 * Subhankar Ghosh || subhankar.130495@gmail.com
 
 ## Acknowledgments
 
-Inspiration, code snippets, etc.
 * [Grant Sanderson | 3b1b](https://github.com/3b1b)
 * [3blue1brown.com](https://www.3blue1brown.com/)
 * [3Blue1Brown | Youtube](https://www.youtube.com/c/3blue1brown)
