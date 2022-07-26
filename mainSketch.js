@@ -69,7 +69,7 @@ let submitBtn;
 let inputVectorFunc;
 
 //This will hold the instance of coordinate display DOM element
-let coordDisplay;
+let coordDisplay, coordDisplayDiv;
 
 //This will hold the instance of x-coordinate and y-coordinate display DOM element
 let xCoord, yCoord;
@@ -122,7 +122,7 @@ function setup() {
   customCanvas.style("z-index: -100");
 
   //Positioning the canvas at left top corner of the screen
-  customCanvas.position(0, 350);
+  customCanvas.position(0, 305);
 
   //These variables will contain the centre of the canvas
   let x0, y0;
@@ -140,6 +140,9 @@ function setup() {
 
   //Getting the instance of the coordinate display element from DOM
   coordDisplay = document.getElementById("coordinate-disp");
+
+  //Getting the instance of the coordinate display div element from DOM
+  coordDisplayDiv = document.getElementById("coordinate-disp-div");
 
   //Getting the instance of the x-coordinate display and editable element from DOM
   xCoord = document.getElementById("x-coordinate");
@@ -786,7 +789,7 @@ function submitButtonPressed() {
     exprFlag = 1;
   }
 
-  window.scrollTo(0, 340);
+  window.scrollTo(0, 305);
 }
 
 function mousePressed() {
@@ -810,6 +813,14 @@ function mousePosition() {
     ) {
       xAxis = round(Xaxis, 2);
       yAxis = round(Yaxis, 2);
+
+      if (displayBoxFlag == 0) {
+        //Drawing a pointer at a point where user has clicked on the vector field
+        fill("red");
+        circle(Xaxis * (20 * mulByPx), -Yaxis * (20 * mulByPx), 8);
+        fill("black");
+        circle(Xaxis * (20 * mulByPx), -Yaxis * (20 * mulByPx), 5);
+      }
     }
   }
 }
@@ -925,7 +936,7 @@ function divergence() {
       y: yCoord.value,
     }).evaluate();
 
-    divergenceVal = pDxVal + qDyVal;
+    divergenceVal = round(pDxVal + qDyVal, 3);
 
     //displaying the divergence value by assigning it to proper DOM element
     divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
@@ -943,7 +954,7 @@ function divergence() {
     pDxVal = round(nerdamer(pDx, { x: xAxis, y: yAxis }).evaluate(), 3);
     qDyVal = round(nerdamer(qDy, { x: xAxis, y: yAxis }).evaluate(), 3);
 
-    divergenceVal = pDxVal + qDyVal;
+    divergenceVal = round(pDxVal + qDyVal, 3);
 
     //displaying the div value by assigning it to proper DOM element
     divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
@@ -966,7 +977,7 @@ function curl() {
     qDxVal = round(nerdamer(qDx, { x: xAxis, y: yAxis }).evaluate(), 3);
 
     //calculating the curl
-    curlVal = qDxVal - pDyVal;
+    curlVal = round(qDxVal - pDyVal, 3);
 
     //displaying the curl equation by assigning it to proper DOM element
     curlEqu.value = curlEq;
@@ -1001,7 +1012,7 @@ function curl() {
     );
 
     //calculating the curl
-    curlVal = qDxVal - pDyVal;
+    curlVal = round(qDxVal - pDyVal, 3);
 
     //displaying the curl equation by assigning it to proper DOM element
     curlEqu.value = curlEq;
@@ -1041,7 +1052,7 @@ function enableButton() {
     customCoordDiv.style.display = "block";
 
     //hiding the element when custom coordinate box is checked
-    coordDisplay.style.display = "none";
+    coordDisplayDiv.style.display = "none";
   } else {
     //first assigning the previously selected coordinate values of editable elements to the non editable elements so that we can show the same values to the non editable elemets that of editable elements
     xAxis = xCoord.value;
@@ -1054,7 +1065,7 @@ function enableButton() {
     customCoordDiv.style.display = "none";
 
     //showing the element again when custom coordinate box is unchecked
-    coordDisplay.style.display = "block";
+    coordDisplayDiv.style.display = "block";
   }
 }
 
