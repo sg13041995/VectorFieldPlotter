@@ -1,11 +1,8 @@
-//It stores the main canvas
+//++++++++++++++++++++++++++++++++++//
+//========GLOBAL VARIABLES==========//
+//++++++++++++++++++++++++++++++++++//
+//It stores the main canvas instance
 let customCanvas;
-
-//CorrectExpr contains the expression that has been successfully executed
-let correctExprX, correctExprY;
-
-//LastExpr contains the immediate last expression that was successfully executed and stored in correctExpr
-let lastExprX, lastExprY;
 
 //It stores the highest magnitude of the vector
 let highestMagnitudeVector;
@@ -64,9 +61,6 @@ let yInput, yInputString;
 
 //This will hold the instance of main submit button DOM element
 let submitBtn;
-
-//This will hold the instance of input vector function DOM element
-let inputVectorFunc;
 
 //This will hold the instance of coordinate display DOM element
 let coordDisplay, coordDisplayDiv;
@@ -135,9 +129,6 @@ function setup() {
   //Translating the drawing axis to x0, y0
   translate(x0, y0);
 
-  //Getting the instance of the Input Vector Function from DOM
-  inputVectorFunc = document.getElementById("input-vector-func");
-
   //Getting the instance of the coordinate display element from DOM
   coordDisplay = document.getElementById("coordinate-disp");
 
@@ -197,24 +188,20 @@ function setup() {
   xInputString = nerdamer.convertFromLaTeX(xInput.value).text();
   yInputString = nerdamer.convertFromLaTeX(yInput.value).text();
 
-  //At first default expression is assigned to lastExpr as it will going to be executed next
-  lastExprX = xInputString;
-  lastExprY = yInputString;
-
-  //As default expresssion was executed successfully we are assigning that to the correctExpr
-  correctExprX = lastExprX;
-  correctExprY = lastExprY;
-
   //This function renders the box and it's axis and labelling for the actual vector field
   outerRectangle();
   axisLines();
   axisLabeling();
 
   //Calling the function to calculate highest magnitude and assigning it to the proper variable
+  // console.time("highestMagnitudeOfVector");
   highestMagnitudeVector = highestMagnitudeOfVector();
+  // console.timeEnd("highestMagnitudeOfVector");
 
   //This function is rsponsible to calculate and render the vector field arrows
+  // console.time("mainVectorFieldPlotter");
   mainVectorFieldPlotter();
+  // console.timeEnd("mainVectorFieldPlotter");
 
   //This function is rsponsible to calculate and render the colour bar, indicating the magnitudes
   colourBarAndMagnitude(highestMagnitudeVector);
@@ -380,112 +367,55 @@ function highestMagnitudeOfVector() {
     highestMagnitude = 0;
 
   //These will hold the evaluated values of the vector components at each point
-  let x, y;
-
-  //xSquare = x^2
-  //ySquare = y^2
-  //magnitude = {square-root(x^2 + y^2)}
-  let magnitude, xSquare, ySquare;
+  let xVal, yVal;
 
   //This is an array variable to hold all the magnitude values of each and every point on the xy plane
   let setOfmagnitude = [];
 
   for (i = -15; i <= 15; i++) {
     for (j = -15; j <= 15; j++) {
-      //We don not want to calculate the magnitude at x=0, y=0, means at the center
-      //As per programming logic i=0, j=0 indicates the centre of the plot
-      if (i === 0 && j === 0) {
+      try {
+        //xVal will hold the P(x,y) or the i-cap component of the vector
+        xVal = Number(nerdamer(xInputString, { x: i, y: j }).evaluate());
+        //yVal will hold the Q(x,y) or the j-cap component of the vector
+        yVal = Number(nerdamer(yInputString, { x: i, y: j }).evaluate());
+      } catch (err) {
+        //Only handle error but don't use return to stop function execution
+        //Type of errors we are catching here are as follows
+        //1) expression like 1/y becasue at y=0 div by zero is not applicable or undefined
+        console.log("Division by 0 is not allowed - highestMagnitudeOfVector");
         continue;
       }
 
-      //else we are going ahead for the calculation at other points
-      else {
-        try {
-          //we also want to check whether there is any error during the calculation according to nerdamer because of invalid input from the user
-          //before going for the evaluation of whole equation at any (x,y) or (i,j), we will evaluate the denominator first
-          //we are trying to calculate or check whether denominator is 0 and that is the main purpose of this calculation
-          //if denominator is zero at any (x,y), then the value of the whole equation will be undefined at that point
-          //so we need to skip the calcuation of magnitude at that point
-          //getting the denominators from each component of the entered vector equation
-          pDenoString = nerdamer(xInputString).denominator().toString();
-          qDenoString = nerdamer(yInputString).denominator().toString();
-
-          //calculating the denominators at each (x,y) or (i,j)
-          //.text() will convert the output, a nerdamer object, to JavaScript string
-          pDenoVal = nerdamer(pDenoString, { x: i, y: j }).evaluate().text();
-          qDenoval = nerdamer(qDenoString, { x: i, y: j }).evaluate().text();
-
-          //if nerdamer gives some error beacuse of invalid input then we are assigning the last correctly executed expessions to lastExpr variable and re-executing it and re-rendering as well
-          //this is to avoid any inconsistencies in the application because of the wrong input
-        } catch (err) {
-          lastExprX = correctExprX;
-          lastExprY = correctExprY;
-          runTheCode();
-          exprFlag = 1;
-        }
-
-        //We are checking whether the value of the denominator is zero
-        //if it is zero then we are going to skip the magnitude calculation at that point or (x,y) or (i,j)
-        if (pDenoVal === "0" || qDenoval === "0") {
-          continue;
-        }
-
-        //else we are going ahead with the calculation of the mangnitude
-        //we also want to check whether there is any error during the calculation according to nerdamer because of invalid input from the user
-        else {
-          try {
-            //x will hold the P(x,y) or the x or i-cap component of the vector
-            x = nerdamer(`simplify(${xInputString})`, { x: i, y: j })
-              .evaluate()
-              .text();
-
-            //y will hold the Q(x,y) or the y or j-cap component of the vector
-            y = nerdamer(`simplify(${yInputString})`, { x: i, y: j })
-              .evaluate()
-              .text();
-          } catch (err) {
-            //assigning the expressions
-            lastExprX = correctExprX;
-            lastExprY = correctExprY;
-
-            //re-running the execution and rendering process
-            runTheCode();
-
-            exprFlag = 1;
-          }
-
-          //calculating the x^2 and y^2
-          xSquare = x * x;
-          ySquare = y * y;
-
-          //calculating the square root of x^2 and y^2
-          magnitude = Math.pow(xSquare + ySquare, 0.5);
-
-          //storing the magnitude inside the array for each and every selected points using i, j
-          setOfmagnitude[count] = magnitude;
-
-          //increasing the count value by 1 at the end of the loop
-          count += 1;
-        }
+      //if xVal or yVal is NaN we don't want it to store inside the setOfmagnitude array and also skipping rest of the calculation for that specific iteration or i, j value
+      if (Number.isNaN(xVal) || Number.isNaN(yVal)) {
+        continue;
       }
+
+      //calculating the square root of (x^2+y^2)
+      magnitude = (xVal ** 2 + yVal ** 2) ** 0.5;
+
+      //storing the magnitude inside the array for each and every selected points using i, j
+      setOfmagnitude[count] = magnitude;
+
+      //increasing the count value by 1 at the end of the loop
+      count += 1;
     }
   }
 
-  //getting the highest magnitude or value from the array of magnitudes
-  highestMagnitude = setOfmagnitude.reduce(function (a, b) {
-    return max(a, b);
-  });
-
-  //if the input expressions are not valid then the immediate above execution will give error
-  //to handle the error, we are using try and catch
-  //we are also re-executing and re-rendering the last successfully executed equation
   try {
-    if (isNaN(highestMagnitude)) throw 50;
+    //getting the highest magnitude or value from the array of magnitudes
+    //if we enter invalid equation (unknown variabe or missing operator or wrong syntax) then the whole calculation will be skipped and the array will be empty
+    //In that case reduce will return an error and to handle that we have used try catch
+    highestMagnitude = setOfmagnitude.reduce(function (a, b) {
+      return max(a, b);
+    });
   } catch (err) {
-    lastExprX = correctExprX;
-    lastExprY = correctExprY;
-    runTheCode();
-    exprFlag = 1;
+    //Type of errors we are catching here are as follows
+    //1) unknown variables in the expression -> yn (n is unknown)
+    //2) missing operator -> xy (shoud be like x*y or x(y)) or y9 (should be y*9 or y(9)) but 9y is valid
+    console.log("Failed to calculate highest magnitude");
+    return "Failed to calculate highest magnitude";
   }
 
   //returning the highest magnitude which was the main purpose of this function
@@ -494,13 +424,13 @@ function highestMagnitudeOfVector() {
 
 //This function is responsible for the calculation and rendering of the actual vector field arrows with colour coding
 function mainVectorFieldPlotter() {
-  let x1, y1, x2, y2, x, y;
-  let x1_20, y1_20, x2_10, y2_10, x_20, y_20;
-  let magnitude, xSquare, ySquare;
+  let x1, y1, x2, y2, xVal, yVal;
+  let x1_20, y1_20, x2_10, y2_10;
+  let magnitude = 0;
   let ijValLow, ijValHigh;
   let i, j;
-  let xUnit, yUnit, xUnit_10, yUnit_10;
-  let a, b, c, theta, flag;
+  let xUnit, yUnit, xUnit_12, yUnit_12;
+  let a, b, c, theta;
 
   ijValLow = 15 / divByij;
   ijValHigh = 15 / divByij;
@@ -511,102 +441,104 @@ function mainVectorFieldPlotter() {
       j <= ijValHigh + 0.001;
       j += 1 / divByij / extraDensity
     ) {
-      if (i == 0 && j == 0) {
+      //Here, (x1,y1) = (x,y) of the coordinate point
+      //x1=x, y1=y axis value of the selected coordinate point
+      x1 = i;
+      y1 = j;
+
+      //Multiplying x1 and y1 with 20 or scaling up the (x1,y1) by 20x
+      x1_20 = i * (20 * mulByPx);
+      y1_20 = j * (20 * mulByPx);
+
+      try {
+        //Evaluating P(x,y) expression at the point i,j or at point (x1,y1)
+        xVal = Number(nerdamer(xInputString, { x: i, y: j }).evaluate());
+        //Evaluating Q(x,y) expression at the point i,j or at point (x1,y1)
+        yVal = Number(nerdamer(yInputString, { x: i, y: j }).evaluate());
+      } catch (err) {
+        //Only handle error but don't use return to stop function execution
+        //Type of errors we are catching here are as follows
+        //1) expression like 1/y becasue at y=0 div by zero is not applicable or undefined
+        console.log("Division by 0 is not allowed - mainVectorFieldPlotter");
+        continue;
+      }
+
+      if (Number.isNaN(xVal) || Number.isNaN(yVal)) {
+        // console.log("Please Check the expression - mainVectorFieldPlotter");
+        continue;
+      }
+
+      //calculating the magnitude
+      magnitude = round((xVal ** 2 + yVal ** 2) ** 0.5, 4);
+
+      //if magnitude is 0 then we dont want to plot the vector
+      if (magnitude === 0) {
         continue;
       } else {
-        try {
-          pDenoString = nerdamer(xInputString).denominator();
-          qDenoString = nerdamer(yInputString).denominator();
-          pDenoVal = nerdamer(pDenoString, { x: i, y: j }).evaluate();
-          qDenoval = nerdamer(qDenoString, { x: i, y: j }).evaluate();
-        } catch (err) {
-          lastExprX = correctExprX;
-          lastExprY = correctExprY;
-          runTheCode();
-          exprFlag = 1;
-        }
-        if (pDenoVal == 0 || qDenoval == 0) {
-          continue;
-        } else {
-          x1 = i;
-          y1 = j;
-          x1_20 = i * (20 * mulByPx);
-          y1_20 = j * (20 * mulByPx);
-          x = nerdamer(xInputString, { x: i, y: j }).evaluate();
-          y = nerdamer(yInputString, { x: i, y: j }).evaluate();
-          x_20 = x * 20;
-          y_20 = y * 20;
-          xSquare = x * x;
-          ySquare = y * y;
-          magnitude = round(sqrt(xSquare + ySquare), 4);
-          xUnit = x / magnitude;
-          yUnit = y / magnitude;
-          xUnit_10 = xUnit * 10;
-          yUnit_10 = yUnit * 10;
-          x2 = x1 + xUnit;
-          y2 = y1 + yUnit;
-          if (enableScalingFlag == 0) {
-            //scaled to unit vector
-            x2_10 = x1_20 + xUnit_10;
-            y2_10 = y1_20 + yUnit_10;
-          }
-          if (enableScalingFlag == 1) {
-            x2_10 = x1_20 + x * sliderValue;
-            y2_10 = y1_20 + y * sliderValue;
-          }
-          a = (y2 - y1) / (x2 - x1);
-          theta = abs(degrees(atan(a)));
-          if (
-            (x2 > x1 && y2 > y1) ||
-            (x2 > x1 && y2 == y1) ||
-            (x2 == x1 && y2 > y1)
-          ) {
-            flag = 1;
-          }
-          if ((x2 < x1 && y2 > y1) || (x2 < x1 && y2 == y1)) {
-            flag = 2;
-          }
-          if (x2 < x1 && y2 < y1) {
-            flag = 3;
-          }
-          if ((x2 > x1 && y2 < y1) || (x2 == x1 && y2 < y1)) {
-            flag = 4;
-          }
-          switch (flag) {
-            case 4:
-              b = theta - 135;
-              c = b - 90;
-              break;
-            case 3:
-              b = -(theta - 45);
-              c = b - 90;
-              break;
-            case 2:
-              b = theta - 45;
-              c = b + 90;
-              break;
-            case 1:
-              b = 90 - theta + 45;
-              c = b + 90;
-              break;
-          }
-          y1_20 = -y1_20;
-          y2_10 = -y2_10;
-          colorMode(HSB, highestMagnitudeVector);
-          stroke(magnitude, highestMagnitudeVector, highestMagnitudeVector);
-          line(x1_20, y1_20, x2_10, y2_10);
-          push();
-          translate(x2_10, y2_10);
-          rotate(radians(b));
-          line(0, 0, 5, 0);
-          pop();
+        //Calculating the unit vector's i cap component
+        xUnit = xVal / magnitude;
+        //Calculating the unit vector's j cap component
+        yUnit = yVal / magnitude;
 
-          push();
-          translate(x2_10, y2_10);
-          rotate(radians(c));
-          line(0, 0, 5, 0);
-          pop();
+        //Scaling unit vector's i cap and j cap components by 10x
+        //This will decide the length of all the plotted vectors at any coordinate point
+        xUnit_12 = xUnit * 13;
+        yUnit_12 = yUnit * 13;
+
+        //Calculating the end point (x2,y2) coordinates of the unit vector without any scaling
+        x2 = x1 + xUnit;
+        y2 = y1 + yUnit;
+
+        if (enableScalingFlag == 0) {
+          //scaled to unit vector
+          x2_10 = x1_20 + xUnit_12;
+          y2_10 = y1_20 + yUnit_12;
         }
+
+        if (enableScalingFlag == 1) {
+          x2_10 = x1_20 + xVal * sliderValue;
+          y2_10 = y1_20 + yVal * sliderValue;
+        }
+
+        a = (y2 - y1) / (x2 - x1);
+
+        theta = abs(degrees(atan(a)));
+
+        if (
+          (x2 > x1 && y2 > y1) ||
+          (x2 > x1 && y2 == y1) ||
+          (x2 == x1 && y2 > y1)
+        ) {
+          b = 90 - theta + 45;
+          c = b + 90;
+        } else if ((x2 < x1 && y2 > y1) || (x2 < x1 && y2 == y1)) {
+          b = theta - 45;
+          c = b + 90;
+        } else if (x2 < x1 && y2 < y1) {
+          b = -(theta - 45);
+          c = b - 90;
+        } else if ((x2 > x1 && y2 < y1) || (x2 == x1 && y2 < y1)) {
+          b = theta - 135;
+          c = b - 90;
+        }
+
+        y1_20 = -y1_20;
+        y2_10 = -y2_10;
+
+        colorMode(HSB, highestMagnitudeVector);
+        stroke(magnitude, highestMagnitudeVector, highestMagnitudeVector);
+        line(x1_20, y1_20, x2_10, y2_10);
+        push();
+        translate(x2_10, y2_10);
+        rotate(radians(b));
+        line(0, 0, 5, 0);
+        pop();
+
+        push();
+        translate(x2_10, y2_10);
+        rotate(radians(c));
+        line(0, 0, 5, 0);
+        pop();
       }
     }
   }
@@ -703,12 +635,10 @@ function UIEquation() {
 function extraDensityEnableFunc() {
   if (this.checked()) {
     // Re-enable the button
-    extraDensity = 1.3;
-    runTheCode();
+    extraDensity = 1.2;
   } else {
     // Disable the button
     extraDensity = 1;
-    runTheCode();
   }
 }
 
@@ -717,7 +647,6 @@ function sliderScaleZoom() {
     // Re-enable the button
     sliderGraphicsZoom.removeAttribute("disabled");
     zoomEnable = 1;
-    runTheCode();
   } else {
     // Disable the button
     sliderGraphicsZoom.attribute("disabled", "");
@@ -736,7 +665,6 @@ function sliderScaleZoom() {
     sliderGraphicsZoom.attribute("disabled", "");
     sliderGraphicsZoom.input(sliderValueZoomRead);
     zoomEnable = 0;
-    runTheCode();
   }
 }
 
@@ -764,32 +692,18 @@ function submitButtonPressed() {
   sliderValue = sliderGraphics.value();
 
   //converting xInput and yInput value, which is in a latex form, to a string form using nerdamer
-  xInputString = nerdamer.convertFromLaTeX(xInput.value).text();
-  yInputString = nerdamer.convertFromLaTeX(yInput.value).text();
-
-  lastExprX = xInputString;
-  lastExprY = yInputString;
-
-  inputVectorFunc.value = `\\vec{F}\\left(x,y\\right)=(${lastExprX})\\hat{i}+(${lastExprY})\\hat{j}`;
+  try {
+    xInputString = nerdamer.convertFromLaTeX(xInput.value).text();
+    yInputString = nerdamer.convertFromLaTeX(yInput.value).text();
+  } catch (err) {
+    //Type of errors we are catching here are as follows
+    //1) incomplete expression -> y-, y(sqrt())
+    return console.log("Incomplete expression - submitButtonPressed");
+  }
 
   runTheCode();
 
-  if (exprFlag == 1) {
-    correctExprX = lastExprX;
-    correctExprY = lastExprY;
-
-    mousePressed();
-    runTheCode();
-  } else {
-    lastExprX = correctExprX;
-    lastExprY = correctExprY;
-    mousePressed();
-    runTheCode();
-
-    exprFlag = 1;
-  }
-
-  window.scrollTo(0, 305);
+  window.scrollTo(0, 300);
 }
 
 function mousePressed() {
@@ -829,66 +743,21 @@ function mousePosition() {
 function calculatePQ() {
   //if custom coordinate user entry checkbox is disabled
   if (displayBoxFlag == 0) {
-    //getting denominator from the equation
-    pDenoString2 = nerdamer(xInputString).denominator().text();
-    qDenoString2 = nerdamer(yInputString).denominator().text();
-
-    //calculating the denominator value at a specific point
-    pDenoVal2 = nerdamer(pDenoString, { x: xAxis, y: yAxis }).evaluate();
-    qDenoval2 = nerdamer(qDenoString, { x: xAxis, y: yAxis }).evaluate();
-
-    //if denominator value is 0 then we are not calculating any of the following
-    //insted we are setting them to UNDEFINED
-    if (pDenoVal2 === 0 || qDenoval2 === 0) {
-      //pxy means P(x,y) value
-      //qxy means Q(x,y) value
-      //divergenceVal and curlVal means divergence and curl value
+    try {
+      pxy = round(nerdamer(xInputString, { x: xAxis, y: yAxis }).evaluate(), 3);
+      qxy = round(nerdamer(yInputString, { x: xAxis, y: yAxis }).evaluate(), 3);
+    } catch (err) {
       pxy = "UNDEFINED";
       qxy = "UNDEFINED";
       divergenceVal = "UNDEFINED";
       curlVal = "UNDEFINED";
-
-      //if denominator is not equals to zero then we will calculate pxy and qxy
-      //then display them on the proper DOM element
-      //for calculating curl and divergence, we are calling two different functions
-    } else {
-      pxy = round(nerdamer(xInputString, { x: xAxis, y: yAxis }).evaluate(), 3);
-      qxy = round(nerdamer(yInputString, { x: xAxis, y: yAxis }).evaluate(), 3);
-
-      divergence();
-      curl();
+      return 500;
     }
   }
 
   //if custom coordinate user entry checkbox is enabled or 1 then we will do the same things as we did above sequentially
-  if (displayBoxFlag == 1) {
-    //getting denominator from the equation
-    pDenoString2 = nerdamer(xInputString).denominator().text();
-    qDenoString2 = nerdamer(yInputString).denominator().text();
-
-    //calculating the denominator value at a specific point
-    pDenoVal2 = nerdamer(pDenoString, {
-      x: xCoord.value,
-      y: yCoord.value,
-    }).evaluate();
-    qDenoval2 = nerdamer(qDenoString, {
-      x: xCoord.value,
-      y: yCoord.value,
-    }).evaluate();
-
-    //if denominator value is 0 then we are not calculating any of the following
-    //insted we are setting them to UNDEFINED
-    if (pDenoVal2 === 0 || qDenoval2 === 0) {
-      //pxy means P(x,y) value
-      //qxy means Q(x,y) value
-      //divergenceVal and curlVal means divergence and curl value
-      pxy = "UNDEFINED";
-      qxy = "UNDEFINED";
-      divergenceVal = "UNDEFINED";
-      curlVal = "UNDEFINED";
-
-      //if denominator is not equals to zero then we will calculate pxy and qxy
-    } else {
+  else if (displayBoxFlag == 1) {
+    try {
       pxy = round(
         nerdamer(xInputString, {
           x: xCoord.value,
@@ -903,12 +772,18 @@ function calculatePQ() {
         }).evaluate(),
         3
       );
-
-      //for calculating curl and divergence, we are calling two different functions
-      divergence();
-      curl();
+    } catch (err) {
+      pxy = "UNDEFINED";
+      qxy = "UNDEFINED";
+      divergenceVal = "UNDEFINED";
+      curlVal = "UNDEFINED";
+      return 1000;
     }
   }
+
+  //for calculating curl and divergence, we are calling two different functions
+  divergence();
+  curl();
 
   //then display them on the proper DOM element
   pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy}`;
@@ -917,16 +792,16 @@ function calculatePQ() {
 
 //This function will calculate the divergence
 function divergence() {
+  pDx = nerdamer.diff(xInputString, "x");
+  qDy = nerdamer.diff(yInputString, "y");
+
+  //This will provide us the divergence equation in nerdamer text version
+  divergenceEq = nerdamer(pDx + "+" + qDy).toTeX();
+
+  //displaying the div equation by assigning it to proper DOM element
+  divEqu.value = divergenceEq;
+
   if (displayBoxFlag == 1) {
-    pDx = nerdamer.diff(xInputString, "x");
-    qDy = nerdamer.diff(yInputString, "y");
-
-    //This will provide us the divergence equation in nerdamer text version
-    divergenceEq = nerdamer(pDx + "+" + qDy).toTeX();
-
-    //displaying the div equation by assigning it to proper DOM element
-    divEqu.value = divergenceEq;
-
     pDxVal = nerdamer(pDx, {
       x: xCoord.value,
       y: yCoord.value,
@@ -935,66 +810,39 @@ function divergence() {
       x: xCoord.value,
       y: yCoord.value,
     }).evaluate();
-
-    divergenceVal = round(pDxVal + qDyVal, 3);
-
-    //displaying the divergence value by assigning it to proper DOM element
-    divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
-  }
-
-  if (displayBoxFlag == 0) {
-    pDx = nerdamer.diff(xInputString, "x");
-    qDy = nerdamer.diff(yInputString, "y");
-
-    divergenceEq = nerdamer(pDx + "+" + qDy).toTeX();
-
-    //displaying the div equation by assigning it to proper DOM element
-    divEqu.value = divergenceEq;
-
+  } else if (displayBoxFlag == 0) {
     pDxVal = round(nerdamer(pDx, { x: xAxis, y: yAxis }).evaluate(), 3);
     qDyVal = round(nerdamer(qDy, { x: xAxis, y: yAxis }).evaluate(), 3);
-
-    divergenceVal = round(pDxVal + qDyVal, 3);
-
-    //displaying the div value by assigning it to proper DOM element
-    divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
   }
+
+  divergenceVal = round(pDxVal + qDyVal, 3);
+
+  //displaying the divergence value by assigning it to proper DOM element
+  divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
+
+  divergenceVal = round(pDxVal + qDyVal, 3);
+
+  //displaying the div value by assigning it to proper DOM element
+  divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
 }
 
 //This function will calculate the curl
 function curl() {
+  //Performing the partial differentiation to get the equations
+  pDy = nerdamer.diff(xInputString, "y");
+  qDx = nerdamer.diff(yInputString, "x");
+
+  //Forming the curl equation and converting to latex for display purpose
+  curlEq = nerdamer(qDx + "-" + pDy).toTeX();
   //if custom coordinate checkbox is disabled
   if (displayBoxFlag == 0) {
-    //Performing the partial differentiation to get the equations
-    pDy = nerdamer.diff(xInputString, "y");
-    qDx = nerdamer.diff(yInputString, "x");
-
-    //Forming the curl equation and converting to latex for display purpose
-    curlEq = nerdamer(qDx + "-" + pDy).toTeX();
-
     //evaluating the differentiation equations at specific points
     pDyVal = round(nerdamer(pDy, { x: xAxis, y: yAxis }).evaluate(), 3);
     qDxVal = round(nerdamer(qDx, { x: xAxis, y: yAxis }).evaluate(), 3);
-
-    //calculating the curl
-    curlVal = round(qDxVal - pDyVal, 3);
-
-    //displaying the curl equation by assigning it to proper DOM element
-    curlEqu.value = curlEq;
-
-    //displaying the curl value by assigning it to proper DOM element
-    curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=${curlVal}`;
   }
 
   //if custom coordinate checkbox is enabled
-  if (displayBoxFlag == 1) {
-    //Performing the partial differentiation to get the equations
-    pDy = nerdamer.diff(xInputString, "y");
-    qDx = nerdamer.diff(yInputString, "x");
-
-    //Forming the curl equation and converting to latex for display purpose
-    curlEq = nerdamer(qDx + "-" + pDy).toTeX();
-
+  else if (displayBoxFlag == 1) {
     //evaluating the differentiation equations at specific points
     pDyVal = round(
       nerdamer(pDy, {
@@ -1010,16 +858,15 @@ function curl() {
       }).evaluate(),
       3
     );
-
-    //calculating the curl
-    curlVal = round(qDxVal - pDyVal, 3);
-
-    //displaying the curl equation by assigning it to proper DOM element
-    curlEqu.value = curlEq;
-
-    //displaying the curl value by assigning it to proper DOM element
-    curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=${curlVal}`;
   }
+  //calculating the curl
+  curlVal = round(qDxVal - pDyVal, 3);
+
+  //displaying the curl equation by assigning it to proper DOM element
+  curlEqu.value = curlEq;
+
+  //displaying the curl value by assigning it to proper DOM element
+  curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=${curlVal}`;
 }
 
 //This function is responsible to inject and display the coordinate values on the respective DOM elements based on the state of custom coordinate enable/ disable check box
@@ -1076,14 +923,12 @@ function sliderScale() {
     xyMax.removeAttribute("disabled");
     xyMin.removeAttribute("disabled");
     enableScalingFlag = 1;
-    runTheCode();
   } else {
     // Disable the button
     sliderGraphics.attribute("disabled", "");
     xyMax.attribute("disabled", "");
     xyMin.attribute("disabled", "");
     enableScalingFlag = 0;
-    runTheCode();
   }
 }
 

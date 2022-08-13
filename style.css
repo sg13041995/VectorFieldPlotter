@@ -88,11 +88,8 @@ body {
 /* styles by id */
 /* =============*/
 
-#top-container {
-}
-
 #bottom-container {
-  margin-top: 35px;
+  margin-top: 85px;
 }
 
 #x-input-div {
@@ -150,12 +147,6 @@ body {
   color: #b12025;
 }
 
-#coordinate-disp-div {
-}
-
-#coordinate-disp {
-}
-
 #custom-coordinate-div {
   position: relative;
 }
@@ -191,48 +182,24 @@ body {
   margin: 0px 1px 0px 1px;
 }
 
-#p-of-xy-div {
-}
-
 #p-of-xy {
   display: inline-block;
-}
-
-#q-of-xy-div {
 }
 
 #q-of-xy {
   display: inline-block;
 }
 
-#curl-equation-div {
-}
-
 #curl-equation-label {
   margin-left: 10px;
-}
-
-#curl-equation {
-}
-
-#curl-value-div {
 }
 
 #curl-value {
   display: inline-block;
 }
 
-#divergence-equation-div {
-}
-
 #divergence-equation-label {
   margin-left: 10px;
-}
-
-#divergence-equation {
-}
-
-#divergence-value-div {
 }
 
 #divergence-value {
