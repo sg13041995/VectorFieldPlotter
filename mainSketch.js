@@ -1,23 +1,27 @@
+//++++++++++++++++++++++++++++++++++++++++//
+//======= DISPLAY LOADER SPINNER =========//
+//++++++++++++++++++++++++++++++++++++++++//
+window.onload = function () {
+  // removing the loader
+  document.getElementById("loader-div-parent").style.display = "none";
+  // bringing the main div
+  document.getElementById("main-div").style.display = "block";
+};
 //++++++++++++++++++++++++++++++++++//
 //========GLOBAL VARIABLES==========//
 //++++++++++++++++++++++++++++++++++//
 //It stores the main canvas instance
 let customCanvas;
-
 //It stores the highest magnitude of the vector
 let highestMagnitudeVector;
-
 //Flag to control the zoom enabling (1) and disabling (0)
 //by default zoom is disabled
 let zoomEnable = 0;
-
 //In order to adjust plots and clicks properly on the screen, we need to change the two following variables simultaneously in proper ratio
-
 //increasing this value to 2 from 1 will change the ploting range from 15 to 7.5 or half of 15
 //The same will also change 1 unit from 20px to 10px and print vector field till -7.5 to 7.5 instead of -15 to 15
 //The same will also change the mouse click position value and range it from -7.5 to 7.5 while keeping the unit density to 10px
 let divByij = 1;
-
 //This defines how many pixels will be counted as 1 unit of our vector field
 //By default 20px means 1 unit when the value of this variable is 1
 //This 20px value has been initialized in different function
@@ -25,7 +29,6 @@ let divByij = 1;
 //This will affect the mouse click position value and plotted arrow positions as well
 //if we change this value then pixel count per unit length will change but values will be plotted all the way from -15 to 15 and we cannot limit that
 let mulByPx = 1;
-
 //Creating variables for smooth slider graphics and it's min-max-step value configuration
 //This will be used in Scaling the vectors
 let sliderGraphics,
@@ -33,7 +36,6 @@ let sliderGraphics,
   sliderValueMin = 0.5,
   sliderValueMax = 2,
   step = 0.02;
-
 //Creating variables for step slider graphics and it's min-max-step value configuration
 //This will be used in zoom in and out of the vector field
 let checkboxZoom,
@@ -43,80 +45,79 @@ let checkboxZoom,
   sliderValueMinZoom = 1,
   sliderValueMaxZoom = 8,
   stepZoom = 1;
-
 //pDenoString and qDenoString will hold the inputX and inputY expression's denominators as strigs
 //pDenoVal and qDenoVal will hold the evaluted values of pDenoString and qDenoString expressions at specific points (x, y) or (i, j)
 let pDenoString, qDenoString, pDenoVal, qDenoval;
-
 //This is a flag
 let exprFlag = 1;
-
 //xInput will get the P(x, y) or i-cap part of the vector function from user
 //xInputString will get string form of the latex input of the mathfield element
 let xInput, xInputString;
-
 //yInput will get the Q(x, y) or j-cap part of the vector function from user
 //yInputString will get string form of the latex input of the mathfield element
 let yInput, yInputString;
-
 //This will hold the instance of main submit button DOM element
 let submitBtn;
-
 //This will hold the instance of coordinate display DOM element
 let coordDisplay, coordDisplayDiv;
-
 //This will hold the instance of x-coordinate and y-coordinate display DOM element
 let xCoord, yCoord;
-
 //custom coordinate div holds the custom user input fields of x-coordinate and y-coordinate
 let customCoordDiv;
-
 //This is a flag variable to store the custom coordinate enable/ disable checkbox status
 let displayBoxFlag = 0;
-
 //This element will hold the instance of pxy DOM element which holds the value of P(x,y) at a specific point
 let pOfXy;
-
 //This element will hold the instance of qxy DOM element which holds the value of Q(x,y) at a specific point
 let qOfXy;
-
+//This element will hold the instance of magnitude DOM element which holds the value of magnitude at a specific point
+let magnitudeVal;
 //This will hold the curl equation and value
 let curlEqu, curlValue;
-
 //This will hold the divergence equation and value
 let divEqu, divValue;
-
 //This is a checkbox for enabling custom coordinate
 let checkbox;
-
 //If the custom coordinate checkbox is enabled then this variable will become 1 else 0
 //So by default the value is zero1
 let checkBoxFlag = 0;
-
 //xAxis and yAxis is the x and y value of a point on the coordinate system selected with our mouse click or entered with custom coordinate math-field element
 //It is the point at which we will calculate all the vector filed properties
 let xAxis = 0,
   yAxis = 0;
-
 //This variable will be responsible for providing additional density
 let extraDensity = 1;
-
-let pxy, qxy, pDenoString2, qDenoString2, pDenoVal2, qDenoval2;
+//pxy and qxy means P(x,y) and Q(x,y) value
+let pxy, qxy;
+//dp/dx, dp/dy and thier values, divergence equation and value
 let pDx, qDy, pDxVal, qDyVal, divergenceEq, divergenceVal;
+//dp/dy, dq/dx and thier values, curl equation and value
 let pDy, qDx, pDyVal, qDxVal, curlEq, curlVal;
-
+//modal <div>, modal-text <p> and Close button <span>
+let modal, modalBody, span, modalHeader;
+//variables for record on off elements
+let recordOff,
+  recordOn,
+  recordFlag = 0;
+//object for storing user click data
+let userClickData;
 let enableScalingFlag = 0,
   checkboxScale;
 let xyMin, xyMax, currentXY;
 
-//******Main setup function******
+//++++++++++++++++++++++++++++++++++//
+//======== SETUP FUNCTION ==========//
+//++++++++++++++++++++++++++++++++++//
 function setup() {
   //Creating the canvas
   customCanvas = createCanvas(1300, 700);
   customCanvas.style("z-index: -100");
 
-  //Positioning the canvas at left top corner of the screen
-  customCanvas.position(0, 305);
+  //Positioning the canvas 350px down
+  customCanvas.position(0, 350);
+  // customCanvas.parent("bottom-container");
+  // customCanvas.position(0,0);
+  // customCanvas.style("z-index: -100");
 
   //These variables will contain the centre of the canvas
   let x0, y0;
@@ -143,7 +144,6 @@ function setup() {
 
   //Getting the instance of the custom coordinate div
   customCoordDiv = document.getElementById("custom-coordinate-div");
-
   //initially we are not showing the element
   customCoordDiv.style.display = "none";
 
@@ -152,6 +152,9 @@ function setup() {
 
   //Getting the instance of p-of-xy element from DOM
   qOfXy = document.getElementById("q-of-xy");
+
+  //Getting the instance of magnitude element from DOM
+  magnitudeVal = document.getElementById("magnitude");
 
   //Getting the DOM element of curl equation display
   curlEqu = document.getElementById("curl-equation");
@@ -165,6 +168,38 @@ function setup() {
   //Getting the DOM element of curl value display
   divValue = document.getElementById("divergence-value");
 
+  //getting record off
+  recordOff = document.getElementById("record-off-icon");
+  recordOff.addEventListener("click", (e) => {
+    recordFlag = 0;
+
+    localStorage.setItem(
+      new Date().toLocaleString(),
+      JSON.stringify(userClickData)
+    );
+    console.log(userClickData);
+  });
+
+  //getting record on
+  recordOn = document.getElementById("record-on-icon");
+  recordOn.addEventListener("click", (e) => {
+    recordFlag = 1;
+
+    userClickData = {
+      vectorFieldEquation: {
+        Pxy: "",
+        Qxy: "",
+      },
+      coordinates: [],
+      vectorFieldValue: [],
+      magnitude: [],
+      curlExpression: "",
+      curlValue: [],
+      divergenceExpression: "",
+      divergenceValue: [],
+    };
+  });
+  
   //Getting the xInput and yInput element from DOM and configuring it to have the virtual keyboard
   xInput = document.getElementById("x-input");
   xInput.setOptions({
@@ -214,6 +249,28 @@ function setup() {
 
   //This function renders interactive UI elements
   UIEquation();
+
+  // Get the modal
+  modal = document.getElementById("myModal");
+  // Get the <p> element that will show the modal text
+  modalBody = document.getElementById("modal-text");
+  // getting modal header
+  modalHeader = document.getElementById("modal-header");
+
+  // Get the <span> element that closes the modal
+  span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks on <span> or close button (X) or background -> close the modal
+  span.onclick = function () {
+    modal.style.display = "none";
+  };
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
 }
 
 //Function to define the outer rectangle of the plot
@@ -383,12 +440,13 @@ function highestMagnitudeOfVector() {
         //Only handle error but don't use return to stop function execution
         //Type of errors we are catching here are as follows
         //1) expression like 1/y becasue at y=0 div by zero is not applicable or undefined
-        console.log("Division by 0 is not allowed - highestMagnitudeOfVector");
+        // console.log("Division by 0 is not allowed - highestMagnitudeOfVector");
         continue;
       }
 
       //if xVal or yVal is NaN we don't want it to store inside the setOfmagnitude array and also skipping rest of the calculation for that specific iteration or i, j value
       if (Number.isNaN(xVal) || Number.isNaN(yVal)) {
+        // console.log("Please Check the expression - highestMagnitudeOfVector");
         continue;
       }
 
@@ -414,7 +472,7 @@ function highestMagnitudeOfVector() {
     //Type of errors we are catching here are as follows
     //1) unknown variables in the expression -> yn (n is unknown)
     //2) missing operator -> xy (shoud be like x*y or x(y)) or y9 (should be y*9 or y(9)) but 9y is valid
-    console.log("Failed to calculate highest magnitude");
+    // console.log("Failed to calculate highest magnitude");
     return "Failed to calculate highest magnitude";
   }
 
@@ -459,17 +517,16 @@ function mainVectorFieldPlotter() {
         //Only handle error but don't use return to stop function execution
         //Type of errors we are catching here are as follows
         //1) expression like 1/y becasue at y=0 div by zero is not applicable or undefined
-        console.log("Division by 0 is not allowed - mainVectorFieldPlotter");
+        // console.log("Division by 0 is not allowed - mainVectorFieldPlotter");
         continue;
       }
 
       if (Number.isNaN(xVal) || Number.isNaN(yVal)) {
         // console.log("Please Check the expression - mainVectorFieldPlotter");
-        continue;
       }
 
       //calculating the magnitude
-      magnitude = round((xVal ** 2 + yVal ** 2) ** 0.5, 4);
+      magnitude = (xVal ** 2 + yVal ** 2) ** 0.5;
 
       //if magnitude is 0 then we dont want to plot the vector
       if (magnitude === 0) {
@@ -544,6 +601,7 @@ function mainVectorFieldPlotter() {
   }
 }
 
+//this function will plot the coulour bar with magnitude label
 function colourBarAndMagnitude(maxValue) {
   const noOfDivision = 341;
   const unitSize = maxValue / noOfDivision;
@@ -681,60 +739,258 @@ function runTheCode() {
   outerRectangle();
   axisLines();
   axisLabeling();
-  UIEquation();
   highestMagnitudeVector = highestMagnitudeOfVector();
   mainVectorFieldPlotter();
   colourBarAndMagnitude(highestMagnitudeVector);
+  UIEquation();
 }
 
 //This function will be called when we will press the submit buton
 function submitButtonPressed() {
-  sliderValue = sliderGraphics.value();
+  let iCap, jCap;
+  let errorString = "";
 
-  //converting xInput and yInput value, which is in a latex form, to a string form using nerdamer
+  //converting xInput and yInput value from latex to nerdamer string
   try {
     xInputString = nerdamer.convertFromLaTeX(xInput.value).text();
     yInputString = nerdamer.convertFromLaTeX(yInput.value).text();
   } catch (err) {
-    //Type of errors we are catching here are as follows
-    //1) incomplete expression -> y-, y(sqrt())
-    return console.log("Incomplete expression - submitButtonPressed");
+    //if conversion not possible then its an incomplete expression
+    modalBody.innerText = `Incomplete Expression...`;
+    modalHeader.innerHTML = "Error!";
+    return (modal.style.display = "block");
   }
 
-  runTheCode();
+  //checking the possible error type based on series of tests
+  //at 0,0
+  try {
+    iCap = Number(nerdamer(xInputString, { x: 0, y: 0 }).evaluate());
+    jCap = Number(nerdamer(yInputString, { x: 0, y: 0 }).evaluate());
+    if (Number.isNaN(iCap) || Number.isNaN(jCap)) {
+      if (Number.isNaN(iCap) && Number.isNaN(jCap)) {
+        throw "pq1;";
+      } else if (Number.isNaN(iCap)) {
+        throw "p1;";
+      } else {
+        throw "q1;";
+      }
+    }
+  } catch (err) {
+    // console.log(err);
+    errorString += err;
+  }
+  //at +,+
+  try {
+    iCap = Number(nerdamer(xInputString, { x: 5, y: 5 }).evaluate());
+    jCap = Number(nerdamer(yInputString, { x: 5, y: 5 }).evaluate());
+    if (Number.isNaN(iCap) || Number.isNaN(jCap)) {
+      if (Number.isNaN(iCap) && Number.isNaN(jCap)) {
+        throw "pq2;";
+      } else if (Number.isNaN(iCap)) {
+        throw "p2;";
+      } else {
+        throw "q2;";
+      }
+    }
+  } catch (err) {
+    // console.log(err);
+    errorString += err;
+  }
+  //at +,-
+  try {
+    iCap = Number(nerdamer(xInputString, { x: 5, y: -5 }).evaluate());
+    jCap = Number(nerdamer(yInputString, { x: 5, y: -5 }).evaluate());
+    if (Number.isNaN(iCap) || Number.isNaN(jCap)) {
+      if (Number.isNaN(iCap) && Number.isNaN(jCap)) {
+        throw "pq3;";
+      } else if (Number.isNaN(iCap)) {
+        throw "p3;";
+      } else {
+        throw "q3;";
+      }
+    }
+  } catch (err) {
+    // console.log(err);
+    errorString += err;
+  }
+  //at -,-
+  try {
+    iCap = Number(nerdamer(xInputString, { x: -5, y: -5 }).evaluate());
+    jCap = Number(nerdamer(yInputString, { x: -5, y: -5 }).evaluate());
+    if (Number.isNaN(iCap) || Number.isNaN(jCap)) {
+      if (Number.isNaN(iCap) && Number.isNaN(jCap)) {
+        throw "pq4;";
+      } else if (Number.isNaN(iCap)) {
+        throw "p4;";
+      } else {
+        throw "q4;";
+      }
+    }
+  } catch (err) {
+    // console.log(err);
+    errorString += err;
+  }
+  //at -,+
+  try {
+    iCap = Number(nerdamer(xInputString, { x: -5, y: 5 }).evaluate());
+    jCap = Number(nerdamer(yInputString, { x: -5, y: 5 }).evaluate());
+    if (Number.isNaN(iCap) || Number.isNaN(jCap)) {
+      if (Number.isNaN(iCap) && Number.isNaN(jCap)) {
+        throw "pq5;";
+      } else if (Number.isNaN(iCap)) {
+        throw "p5;";
+      } else {
+        throw "q5;";
+      }
+    }
+  } catch (err) {
+    // console.log(err);
+    errorString += err;
+  }
 
-  window.scrollTo(0, 300);
+  let checkOne = /p1;|p2;|p3;|p4;|p5/g;
+  let resultOne = errorString.match(checkOne);
+
+  if (resultOne === null || resultOne.length < 4) {
+    runTheCode();
+    window.scrollTo(0, 300);
+    return;
+  } else if (resultOne.length >= 4) {
+    modalBody.innerText = `Invalid Input Expression...\nOR\nUnknown Input Variable...`;
+    modalHeader.innerHTML = "Error!";
+    return (modal.style.display = "block");
+  }
 }
 
+//this function inserts the vector field information at user selected points into userClickData object to store it the localStorage
+function saveUserclickData(
+  xInputString,
+  yInputString,
+  xAxis,
+  yAxis,
+  xCoord,
+  yCoord,
+  pxy,
+  qxy,
+  magnitude,
+  curlEq,
+  curlVal,
+  divergenceEq,
+  divergenceVal
+) {
+  //P(x,y) and Q(x,y) expression
+  userClickData.vectorFieldEquation.Pxy = xInputString;
+  userClickData.vectorFieldEquation.Qxy = yInputString;
+
+  //Selected coordinate value (x, y) based on click and custom coordinate input
+  let coordinatesTemp;
+  if (displayBoxFlag == 0) {
+    coordinatesTemp = {
+      x: xAxis,
+      y: yAxis,
+    };
+  } else {
+    coordinatesTemp = {
+      x: xCoord.value,
+      y: yCoord.value,
+    };
+  }
+  userClickData.coordinates.push(coordinatesTemp);
+
+  //P(x,y) and Q(x,y) value at a specific selected point
+  let vectorFieldValueTemp = {
+    PxyValue: Number(pxy).toFixed(6),
+    QxyValue: Number(qxy).toFixed(6),
+  };
+  userClickData.vectorFieldValue.push(vectorFieldValueTemp);
+
+  //magnitude
+  userClickData.magnitude.push(magnitude.toFixed(6));
+
+  //curl equation
+  userClickData.curlExpression = curlEq;
+
+  //curl value
+  userClickData.curlValue.push(curlVal);
+
+  //divergence equation
+  userClickData.divergenceExpression = divergenceEq;
+
+  //divergence value
+  userClickData.divergenceValue.push(divergenceVal);
+}
+
+//When mouse clicked
 function mousePressed() {
-  mousePosition();
-  calculatePQ();
-  displayData();
+  //mouse position returns a boolean value
+  //true/false based on whether we have clicked inside or outside the plotting area
+  let isClickedInside = mousePosition();
+
+  if (isClickedInside) {
+    //calculating the values with selected point
+    calculatePQ();
+    //rendering the updated values
+    displayData();
+    //if custom coordinate is enabled
+    if (displayBoxFlag === 0) {
+      //Drawing a pointer at a point where user has clicked on the vector field
+      fill("red");
+      circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 8);
+      fill("black");
+      circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 5);
+    } else if (displayBoxFlag === 1) {
+      //Drawing a pointer at a point where user has clicked on the vector field
+      fill("red");
+      circle(xCoord.value * (20 * mulByPx), -yCoord.value * (20 * mulByPx), 8);
+      fill("black");
+      circle(xCoord.value * (20 * mulByPx), -yCoord.value * (20 * mulByPx), 5);
+    }
+    //we are recording the data if recording is enabled
+    if (recordFlag === 1) {
+      saveUserclickData(
+        xInputString,
+        yInputString,
+        xAxis,
+        yAxis,
+        xCoord,
+        yCoord,
+        pxy,
+        qxy,
+        magnitude,
+        curlEq,
+        curlVal,
+        divergenceEq,
+        divergenceVal
+      );
+    }
+  }
 }
 
+// Check and return whether we have clicked inside or outside of the plotting area
 function mousePosition() {
   let mouseXpos, mouseYpos, Xaxis, Yaxis;
+  //indicated whether our mouse click in inside or outside the vector field plotting area
+  let isClickedInside = false;
   if (mouseIsPressed) {
     mouseXpos = mouseX - 650;
     mouseYpos = -(mouseY - 350);
     Xaxis = mouseXpos / (20 * mulByPx);
     Yaxis = mouseYpos / (20 * mulByPx);
+    //checking whether the clicked coordinate is inside our vector field plotting area
     if (
       Xaxis >= -15.99 / divByij &&
       Xaxis <= 15.99 / divByij &&
       Yaxis >= -15.99 / divByij &&
       Yaxis <= 15.99 / divByij
     ) {
-      xAxis = round(Xaxis, 2);
-      yAxis = round(Yaxis, 2);
-
-      if (displayBoxFlag == 0) {
-        //Drawing a pointer at a point where user has clicked on the vector field
-        fill("red");
-        circle(Xaxis * (20 * mulByPx), -Yaxis * (20 * mulByPx), 8);
-        fill("black");
-        circle(Xaxis * (20 * mulByPx), -Yaxis * (20 * mulByPx), 5);
-      }
+      //recording the click coordinate according to our plotting area
+      xAxis = Xaxis.toFixed(3);
+      yAxis = Yaxis.toFixed(3);
+      isClickedInside = true;
+      return isClickedInside;
+    } else {
+      isClickedInside = false;
+      return isClickedInside;
     }
   }
 }
@@ -744,40 +1000,32 @@ function calculatePQ() {
   //if custom coordinate user entry checkbox is disabled
   if (displayBoxFlag == 0) {
     try {
-      pxy = round(nerdamer(xInputString, { x: xAxis, y: yAxis }).evaluate(), 3);
-      qxy = round(nerdamer(yInputString, { x: xAxis, y: yAxis }).evaluate(), 3);
+      pxy = nerdamer(xInputString, { x: xAxis, y: yAxis }).evaluate();
+      qxy = nerdamer(yInputString, { x: xAxis, y: yAxis }).evaluate();
     } catch (err) {
       pxy = "UNDEFINED";
       qxy = "UNDEFINED";
       divergenceVal = "UNDEFINED";
       curlVal = "UNDEFINED";
-      return 500;
     }
   }
 
   //if custom coordinate user entry checkbox is enabled or 1 then we will do the same things as we did above sequentially
   else if (displayBoxFlag == 1) {
     try {
-      pxy = round(
-        nerdamer(xInputString, {
-          x: xCoord.value,
-          y: yCoord.value,
-        }).evaluate(),
-        3
-      );
-      qxy = round(
-        nerdamer(yInputString, {
-          x: xCoord.value,
-          y: yCoord.value,
-        }).evaluate(),
-        3
-      );
+      pxy = nerdamer(xInputString, {
+        x: xCoord.value,
+        y: yCoord.value,
+      }).evaluate();
+      qxy = nerdamer(yInputString, {
+        x: xCoord.value,
+        y: yCoord.value,
+      }).evaluate();
     } catch (err) {
       pxy = "UNDEFINED";
       qxy = "UNDEFINED";
       divergenceVal = "UNDEFINED";
       curlVal = "UNDEFINED";
-      return 1000;
     }
   }
 
@@ -786,8 +1034,12 @@ function calculatePQ() {
   curl();
 
   //then display them on the proper DOM element
-  pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy}`;
-  qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy}`;
+  pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${Number(pxy).toFixed(6)}`;
+  qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${Number(qxy).toFixed(6)}`;
+  magnitudeVal.value = `\\sqrt{P^2+Q^2}=${(
+    (pxy ** 2 + qxy ** 2) **
+    0.5
+  ).toFixed(6)}`;
 }
 
 //This function will calculate the divergence
@@ -796,77 +1048,69 @@ function divergence() {
   qDy = nerdamer.diff(yInputString, "y");
 
   //This will provide us the divergence equation in nerdamer text version
-  divergenceEq = nerdamer(pDx + "+" + qDy).toTeX();
+  divergenceEq = nerdamer(nerdamer(pDx).add(qDy));
 
   //displaying the div equation by assigning it to proper DOM element
-  divEqu.value = divergenceEq;
+  divEqu.value = divergenceEq.toTeX();
 
   if (displayBoxFlag == 1) {
-    pDxVal = nerdamer(pDx, {
+    divergenceVal = nerdamer(divergenceEq, {
       x: xCoord.value,
       y: yCoord.value,
-    }).evaluate();
-    qDyVal = nerdamer(qDy, {
-      x: xCoord.value,
-      y: yCoord.value,
-    }).evaluate();
+    })
+      .evaluate()
+      .text();
   } else if (displayBoxFlag == 0) {
-    pDxVal = round(nerdamer(pDx, { x: xAxis, y: yAxis }).evaluate(), 3);
-    qDyVal = round(nerdamer(qDy, { x: xAxis, y: yAxis }).evaluate(), 3);
+    divergenceVal = nerdamer(divergenceEq, { x: xAxis, y: yAxis })
+      .evaluate()
+      .text();
   }
 
-  divergenceVal = round(pDxVal + qDyVal, 3);
-
-  //displaying the divergence value by assigning it to proper DOM element
-  divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
-
-  divergenceVal = round(pDxVal + qDyVal, 3);
-
-  //displaying the div value by assigning it to proper DOM element
-  divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
+  if (divergenceVal.includes("i")) {
+    //displaying the div value by assigning it to proper DOM element
+    divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
+  } else {
+    //displaying the div value by assigning it to proper DOM element
+    divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${Number(
+      divergenceVal
+    ).toFixed(6)}`;
+  }
 }
 
 //This function will calculate the curl
 function curl() {
+  nerdamer.flush();
+
   //Performing the partial differentiation to get the equations
-  pDy = nerdamer.diff(xInputString, "y");
-  qDx = nerdamer.diff(yInputString, "x");
+  qDx = nerdamer.diff(yInputString, 'x');
+  pDy = nerdamer.diff(xInputString, 'y');
 
   //Forming the curl equation and converting to latex for display purpose
-  curlEq = nerdamer(qDx + "-" + pDy).toTeX();
-  //if custom coordinate checkbox is disabled
-  if (displayBoxFlag == 0) {
-    //evaluating the differentiation equations at specific points
-    pDyVal = round(nerdamer(pDy, { x: xAxis, y: yAxis }).evaluate(), 3);
-    qDxVal = round(nerdamer(qDx, { x: xAxis, y: yAxis }).evaluate(), 3);
-  }
-
-  //if custom coordinate checkbox is enabled
-  else if (displayBoxFlag == 1) {
-    //evaluating the differentiation equations at specific points
-    pDyVal = round(
-      nerdamer(pDy, {
-        x: xCoord.value,
-        y: yCoord.value,
-      }).evaluate(),
-      3
-    );
-    qDxVal = round(
-      nerdamer(qDx, {
-        x: xCoord.value,
-        y: yCoord.value,
-      }).evaluate(),
-      3
-    );
-  }
-  //calculating the curl
-  curlVal = round(qDxVal - pDyVal, 3);
+  curlEq = nerdamer(nerdamer(qDx).subtract(pDy));
 
   //displaying the curl equation by assigning it to proper DOM element
-  curlEqu.value = curlEq;
+  curlEqu.value = curlEq.toTeX();
 
-  //displaying the curl value by assigning it to proper DOM element
-  curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=${curlVal}`;
+  if (displayBoxFlag == 1) {
+    curlVal = nerdamer(curlEq, {
+      x: xCoord.value,
+      y: yCoord.value,
+    })
+      .evaluate()
+      .text();
+  } else if (displayBoxFlag == 0) {
+    curlVal = nerdamer(curlEq, { x: xAxis, y: yAxis }).evaluate().text();
+  }
+
+  if (curlVal.includes("i")) {
+    //displaying the div value by assigning it to proper DOM element
+    curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=${curlVal}`;
+  } else {
+    //displaying the div value by assigning it to proper DOM element
+    curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=${Number(
+      curlVal
+    ).toFixed(6)}`;
+  }
 }
 
 //This function is responsible to inject and display the coordinate values on the respective DOM elements based on the state of custom coordinate enable/ disable check box
