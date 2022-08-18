@@ -199,7 +199,7 @@ function setup() {
       divergenceValue: [],
     };
   });
-  
+
   //Getting the xInput and yInput element from DOM and configuring it to have the virtual keyboard
   xInput = document.getElementById("x-input");
   xInput.setOptions({
@@ -848,7 +848,8 @@ function submitButtonPressed() {
     errorString += err;
   }
 
-  let checkOne = /p1;|p2;|p3;|p4;|p5/g;
+  let checkOne =
+    /p1;|p2;|p3;|p4;|p5|q1;|q2;|q3;|q4;|q5|pq1;|pq2;|pq3;|pq4;|pq5/g;
   let resultOne = errorString.match(checkOne);
 
   if (resultOne === null || resultOne.length < 4) {
@@ -899,22 +900,22 @@ function saveUserclickData(
 
   //P(x,y) and Q(x,y) value at a specific selected point
   let vectorFieldValueTemp = {
-    PxyValue: Number(pxy).toFixed(6),
-    QxyValue: Number(qxy).toFixed(6),
+    PxyValue: pxy.toFixed(6),
+    QxyValue: qxy.toFixed(6),
   };
   userClickData.vectorFieldValue.push(vectorFieldValueTemp);
 
   //magnitude
-  userClickData.magnitude.push(magnitude.toFixed(6));
+  userClickData.magnitude.push(Number(magnitude).toFixed(6));
 
   //curl equation
-  userClickData.curlExpression = curlEq;
+  userClickData.curlExpression = curlEq.text();
 
   //curl value
   userClickData.curlValue.push(curlVal);
 
   //divergence equation
-  userClickData.divergenceExpression = divergenceEq;
+  userClickData.divergenceExpression = divergenceEq.text();
 
   //divergence value
   userClickData.divergenceValue.push(divergenceVal);
@@ -928,40 +929,50 @@ function mousePressed() {
 
   if (isClickedInside) {
     //calculating the values with selected point
-    calculatePQ();
+    let magnitude = calculatePQ();
     //rendering the updated values
     displayData();
-    //if custom coordinate is enabled
-    if (displayBoxFlag === 0) {
-      //Drawing a pointer at a point where user has clicked on the vector field
-      fill("red");
-      circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 8);
-      fill("black");
-      circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 5);
-    } else if (displayBoxFlag === 1) {
-      //Drawing a pointer at a point where user has clicked on the vector field
-      fill("red");
-      circle(xCoord.value * (20 * mulByPx), -yCoord.value * (20 * mulByPx), 8);
-      fill("black");
-      circle(xCoord.value * (20 * mulByPx), -yCoord.value * (20 * mulByPx), 5);
-    }
-    //we are recording the data if recording is enabled
-    if (recordFlag === 1) {
-      saveUserclickData(
-        xInputString,
-        yInputString,
-        xAxis,
-        yAxis,
-        xCoord,
-        yCoord,
-        pxy,
-        qxy,
-        magnitude,
-        curlEq,
-        curlVal,
-        divergenceEq,
-        divergenceVal
-      );
+    if (magnitude) {
+      //if custom coordinate is enabled
+      if (displayBoxFlag == 0) {
+        //Drawing a pointer at a point where user has clicked on the vector field
+        fill("red");
+        circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 8);
+        fill("black");
+        circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 5);
+      } else if (displayBoxFlag == 1) {
+        //Drawing a pointer at a point where user has clicked on the vector field
+        fill("red");
+        circle(
+          xCoord.value * (20 * mulByPx),
+          -yCoord.value * (20 * mulByPx),
+          8
+        );
+        fill("black");
+        circle(
+          xCoord.value * (20 * mulByPx),
+          -yCoord.value * (20 * mulByPx),
+          5
+        );
+      }
+      //we are recording the data if recording is enabled
+      if (recordFlag === 1) {
+        saveUserclickData(
+          xInputString,
+          yInputString,
+          xAxis,
+          yAxis,
+          xCoord,
+          yCoord,
+          pxy,
+          qxy,
+          magnitude,
+          curlEq,
+          curlVal,
+          divergenceEq,
+          divergenceVal
+        );
+      }
     }
   }
 }
@@ -995,122 +1006,146 @@ function mousePosition() {
   }
 }
 
-//This function will calculate P(x,y) and Q(x,y) value from the equations
+//calculates P(x,y);Q(x,y);magnitude;
+//display P(x,y);Q(x,y);curlEq;CurlVal;DivEq;DivVal;
 function calculatePQ() {
-  //if custom coordinate user entry checkbox is disabled
+  let x, y;
+  let magnitude;
+
   if (displayBoxFlag == 0) {
-    try {
-      pxy = nerdamer(xInputString, { x: xAxis, y: yAxis }).evaluate();
-      qxy = nerdamer(yInputString, { x: xAxis, y: yAxis }).evaluate();
-    } catch (err) {
-      pxy = "UNDEFINED";
-      qxy = "UNDEFINED";
-      divergenceVal = "UNDEFINED";
-      curlVal = "UNDEFINED";
-    }
+    x = xAxis;
+    y = yAxis;
+  } else if (displayBoxFlag == 1) {
+    x = xCoord.value;
+    y = yCoord.value;
   }
 
-  //if custom coordinate user entry checkbox is enabled or 1 then we will do the same things as we did above sequentially
-  else if (displayBoxFlag == 1) {
-    try {
-      pxy = nerdamer(xInputString, {
-        x: xCoord.value,
-        y: yCoord.value,
-      }).evaluate();
-      qxy = nerdamer(yInputString, {
-        x: xCoord.value,
-        y: yCoord.value,
-      }).evaluate();
-    } catch (err) {
-      pxy = "UNDEFINED";
-      qxy = "UNDEFINED";
-      divergenceVal = "UNDEFINED";
-      curlVal = "UNDEFINED";
+  try {
+    pxy = Number(nerdamer(xInputString, { x: x, y: y }).evaluate());
+    qxy = Number(nerdamer(yInputString, { x: x, y: y }).evaluate());
+  } catch (err) {
+    pxy = "UNDEF";
+    qxy = "UNDEF";
+    magnitude = "UNDEF";
+  }
+
+  if (magnitude != "UNDEF") {
+    magnitude = ((pxy ** 2 + qxy ** 2) ** 0.5).toFixed(6);
+  }
+
+  console.log(typeof pxy, typeof qxy);
+  
+
+  if (Number.isNaN(pxy) || Number.isNaN(qxy)) {
+    let message = "";
+    if (Number.isNaN(pxy) && Number.isNaN(qxy)) {
+      message =
+        "P(x,y) and Q(x,y) are not valid at the selected coordinate point";
+    } else if (Number.isNaN(pxy)) {
+      message = "P(x,y) is not valid at the selected coordinate point";
+    } else {
+      message = "Q(x,y) is not valid at the selected coordinate point";
     }
+    modalBody.innerText = `${message}`;
+    modalHeader.innerHTML = "ATTENTION!";
+    modal.style.display = "block";
+    return false;
   }
 
   //for calculating curl and divergence, we are calling two different functions
-  divergence();
-  curl();
+  let [divE, divV] = divergence();
+  let [curlE, curlV] = curl();
 
-  //then display them on the proper DOM element
-  pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${Number(pxy).toFixed(6)}`;
-  qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${Number(qxy).toFixed(6)}`;
-  magnitudeVal.value = `\\sqrt{P^2+Q^2}=${(
-    (pxy ** 2 + qxy ** 2) **
-    0.5
-  ).toFixed(6)}`;
+  // console.log("div and curl done");
+
+  if (pxy != "UNDEF" || qxy != "UNDEF") {
+    //displaying P(x,y) Q(x,y)
+    pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy.toFixed(6)}`;
+    qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy.toFixed(6)}`;
+  } else {
+    //displaying P(x,y) Q(x,y)
+    pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy}`;
+    qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy}`;
+  }
+
+  //calculating and displaying magnitude
+  magnitudeVal.value = `\\sqrt{P^2+Q^2}=${magnitude}`;
+
+  //displaying the curl equation by assigning it to proper DOM element
+  curlEqu.value = curlE.toTeX();
+
+  //displaying the div value by assigning it to proper DOM element
+  curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=
+  ${curlV}`;
+
+  //displaying the div equation by assigning it to proper DOM element
+  divEqu.value = divE.toTeX();
+
+  //displaying the divergence value by assigning it to proper DOM element
+  divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=
+  {${divV}`;
+
+  return magnitude;
 }
 
-//This function will calculate the divergence
+//calculates and return divergence equation and value
 function divergence() {
+  // console.log("div called");
+
+  //partial differentiation
   pDx = nerdamer.diff(xInputString, "x");
   qDy = nerdamer.diff(yInputString, "y");
 
-  //This will provide us the divergence equation in nerdamer text version
-  divergenceEq = nerdamer(nerdamer(pDx).add(qDy));
+  //divergence equation
+  divergenceEq = nerdamer(pDx).add(qDy);
 
-  //displaying the div equation by assigning it to proper DOM element
-  divEqu.value = divergenceEq.toTeX();
-
-  if (displayBoxFlag == 1) {
-    divergenceVal = nerdamer(divergenceEq, {
-      x: xCoord.value,
-      y: yCoord.value,
-    })
-      .evaluate()
-      .text();
-  } else if (displayBoxFlag == 0) {
-    divergenceVal = nerdamer(divergenceEq, { x: xAxis, y: yAxis })
-      .evaluate()
-      .text();
+  //divergence value
+  try {
+    if (displayBoxFlag == 1) {
+      divergenceVal = Number(
+        nerdamer(divergenceEq, {
+          x: xCoord.value,
+          y: yCoord.value,
+        }).evaluate()
+      ).toFixed(6);
+    } else if (displayBoxFlag == 0) {
+      divergenceVal = Number(
+        nerdamer(divergenceEq, { x: xAxis, y: yAxis }).evaluate()
+      ).toFixed(6);
+    }
+  } catch (err) {
+    divergenceVal = "UNDEF";
   }
 
-  if (divergenceVal.includes("i")) {
-    //displaying the div value by assigning it to proper DOM element
-    divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${divergenceVal}`;
-  } else {
-    //displaying the div value by assigning it to proper DOM element
-    divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=${Number(
-      divergenceVal
-    ).toFixed(6)}`;
-  }
+  return [divergenceEq, divergenceVal];
 }
 
-//This function will calculate the curl
+//calculates and return curl equation and value
 function curl() {
-  nerdamer.flush();
-
-  //Performing the partial differentiation to get the equations
-  qDx = nerdamer.diff(yInputString, 'x');
-  pDy = nerdamer.diff(xInputString, 'y');
-
-  //Forming the curl equation and converting to latex for display purpose
-  curlEq = nerdamer(nerdamer(qDx).subtract(pDy));
-
-  //displaying the curl equation by assigning it to proper DOM element
-  curlEqu.value = curlEq.toTeX();
-
-  if (displayBoxFlag == 1) {
-    curlVal = nerdamer(curlEq, {
-      x: xCoord.value,
-      y: yCoord.value,
-    })
-      .evaluate()
-      .text();
-  } else if (displayBoxFlag == 0) {
-    curlVal = nerdamer(curlEq, { x: xAxis, y: yAxis }).evaluate().text();
+  //partial differentiation
+  qDx = nerdamer.diff(yInputString, "x");
+  pDy = nerdamer.diff(xInputString, "y");
+  //curl equation
+  curlEq = nerdamer(qDx).subtract(pDy);
+  // curl value
+  try {
+    if (displayBoxFlag == 1) {
+      curlVal = Number(
+        nerdamer(curlEq, {
+          x: xCoord.value,
+          y: yCoord.value,
+        }).evaluate()
+      ).toFixed(6);
+    } else if (displayBoxFlag == 0) {
+      curlVal = Number(
+        nerdamer(curlEq, { x: xAxis, y: yAxis }).evaluate()
+      ).toFixed(6);
+    }
+  } catch (err) {
+    curlVal = "UNDEF";
   }
 
-  if (curlVal.includes("i")) {
-    //displaying the div value by assigning it to proper DOM element
-    curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=${curlVal}`;
-  } else {
-    //displaying the div value by assigning it to proper DOM element
-    curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=${Number(
-      curlVal
-    ).toFixed(6)}`;
-  }
+  return [curlEq, curlVal];
 }
 
 //This function is responsible to inject and display the coordinate values on the respective DOM elements based on the state of custom coordinate enable/ disable check box
