@@ -7,6 +7,7 @@ window.onload = function () {
   // bringing the main div
   document.getElementById("main-div").style.display = "block";
 };
+
 //++++++++++++++++++++++++++++++++++//
 //========GLOBAL VARIABLES==========//
 //++++++++++++++++++++++++++++++++++//
@@ -16,7 +17,7 @@ let customCanvas;
 let highestMagnitudeVector;
 //Flag to control the zoom enabling (1) and disabling (0)
 //by default zoom is disabled
-let zoomEnable = 0;
+
 //In order to adjust plots and clicks properly on the screen, we need to change the two following variables simultaneously in proper ratio
 //increasing this value to 2 from 1 will change the ploting range from 15 to 7.5 or half of 15
 //The same will also change 1 unit from 20px to 10px and print vector field till -7.5 to 7.5 instead of -15 to 15
@@ -80,22 +81,184 @@ let divEqu, divValue;
 let checkBoxFlag = 0;
 //modal <div>, modal-text <p> and Close button <span>
 let modal, modalBody, span, modalHeader;
-//variables for record on off elements
-let recordOff,
-  recordOn,
-  recordFlag = 0;
+
 //switch-on-off div reference
 let switchOnOff;
-//This is a flag variable to store the custom coordinate enable/ disable checkbox status
-let displayBoxFlag = 0;
+
 let xAxisGlobal = 0,
   yAxisGlobal = 0;
 
-//object for storing user click data
-let userClickData;
-let enableScalingFlag = 0,
-  checkboxScale;
 let xyMin, xyMax, currentXY;
+// =================================================================
+//custom coordinate enable/disable status check flag
+let displayBoxFlagGlobal = false;
+//record on/off flag
+let recordFlagGlobal = false;
+//storing user click data and save it to the loaclStorage
+let userClickDataGlobal;
+// scaling factor enable/disable flag
+let scalingFlagGlobal = false;
+// zooming enable/disable flag
+let zoomFlagGlobal = false;
+
+//++++++++++++++++++++++++++++++++++//
+//======= HANDLER FUNCTIONS ========//
+//++++++++++++++++++++++++++++++++++//
+//defining recordOffHandler function
+const recordOffHandler = (event) => {
+  recordFlagGlobal = false;
+
+  //saving data to localStorage
+  localStorage.setItem(
+    new Date().toLocaleString(),
+    JSON.stringify(userClickDataGlobal)
+  );
+  console.log(userClickDataGlobal);
+};
+// =====================================
+//defining recordOnHandler function
+const recordOnHandler = (event) => {
+  recordFlagGlobal = true;
+  //initializing the recording object
+  userClickDataGlobal = {
+    vectorFieldEquation: {
+      Pxy: "",
+      Qxy: "",
+    },
+    coordinates: [],
+    vectorFieldValue: [],
+    magnitude: [],
+    curlExpression: "",
+    curlValue: [],
+    divergenceExpression: "",
+    divergenceValue: [],
+  };
+};
+// ======================================
+//inserts the vector field information at user selected points into userClickDataGlobal object
+const userClickDataInsertHandler = (
+  xInputString,
+  yInputString,
+  xAxis,
+  yAxis,
+  xCoord,
+  yCoord,
+  pxy,
+  qxy,
+  magnitude,
+  curlEq,
+  curlVal,
+  divergenceEq,
+  divergenceVal
+) => {
+  //P(x,y) and Q(x,y) expression
+  userClickDataGlobal.vectorFieldEquation.Pxy = xInputString;
+  userClickDataGlobal.vectorFieldEquation.Qxy = yInputString;
+  //Selected coordinate value (x, y) based on click and custom coordinate input
+  let coordinatesTemp;
+  if (displayBoxFlagGlobal === false) {
+    coordinatesTemp = {
+      x: xAxis,
+      y: yAxis,
+    };
+  } else {
+    coordinatesTemp = {
+      x: xCoord.value,
+      y: yCoord.value,
+    };
+  }
+  userClickDataGlobal.coordinates.push(coordinatesTemp);
+  //P(x,y) and Q(x,y) value at a specific selected point
+  let vectorFieldValueTemp = {
+    PxyValue: Number(pxy.toFixed(6)),
+    QxyValue: Number(qxy.toFixed(6)),
+  };
+  userClickDataGlobal.vectorFieldValue.push(vectorFieldValueTemp);
+  //magnitude
+  userClickDataGlobal.magnitude.push(Number(magnitude.toFixed(6)));
+  //curl equation
+  userClickDataGlobal.curlExpression = curlEq.text();
+  //curl value
+  userClickDataGlobal.curlValue.push(curlVal);
+  //divergence equation
+  userClickDataGlobal.divergenceExpression = divergenceEq.text();
+  //divergence value
+  userClickDataGlobal.divergenceValue.push(divergenceVal);
+};
+// =====================================================================
+//defining scaleOn handler
+const scaleOnHandler = () => {
+  sliderGraphics.removeAttribute("disabled");
+  xyMax.removeAttribute("disabled");
+  xyMin.removeAttribute("disabled");
+  scalingFlagGlobal = true;
+};
+// ==================================================================
+//defining scaleOff handler
+const scaleOffHandler = () => {
+  sliderGraphics.attribute("disabled", "");
+  xyMax.attribute("disabled", "");
+  xyMin.attribute("disabled", "");
+  scalingFlagGlobal = false;
+  submitButtonPressed();
+};
+// =====================================================================
+//defining zoomOn handler
+const zoomOnHandler = () => {
+  sliderGraphicsZoom.removeAttribute("disabled");
+  zoomFlagGlobal = true;
+};
+//defining zoomOff handler
+const zoomOffHandler = () => {
+  sliderGraphicsZoom.attribute("disabled", "");
+  divByij = 1;
+  mulByPx = 1;
+  sliderValueZoom = 1;
+  sliderGraphicsZoom.remove();
+  sliderGraphicsZoom = createSlider(
+    sliderValueMinZoom,
+    sliderValueMaxZoom,
+    sliderValueZoom,
+    stepZoom
+  );
+  sliderGraphicsZoom.position(customCanvas.x + 1025, sliderGraphics.y + 110);
+  sliderGraphicsZoom.style("width", "220px");
+  sliderGraphicsZoom.attribute("disabled", "");
+  sliderGraphicsZoom.input(sliderValueZoomRead);
+  submitButtonPressed();
+  zoomFlagGlobal = false;
+};
+// =============================================================
+
+//++++++++++++++++++++++++++++++++++//
+//==== DOM ELEMENT REFERENCES ======//
+//++++++++++++++++++++++++++++++++++//
+//getting the DOM element reference
+const recordOff = document.getElementById("record-off-icon");
+//adding click event listener
+recordOff.addEventListener("click", recordOnHandler);
+//==============================================================
+//getting the DOM element reference
+const recordOn = document.getElementById("record-on-icon");
+//adding click event listener
+recordOn.addEventListener("click", recordOffHandler);
+// ===============================================================
+const scaleOn = document.getElementById("scale-on-icon");
+//adding click event listener
+scaleOn.addEventListener("click", scaleOffHandler);
+// =================================================================
+const scaleOff = document.getElementById("scale-off-icon");
+//adding click event listener
+scaleOff.addEventListener("click", scaleOnHandler);
+// ===================================================================
+const zoomOn = document.getElementById("zoom-on-icon");
+//adding click event listener
+zoomOn.addEventListener("click", zoomOffHandler);
+// =================================================================
+const zoomOff = document.getElementById("zoom-off-icon");
+//adding click event listener
+zoomOff.addEventListener("click", zoomOnHandler);
+// ===================================================================
 
 //++++++++++++++++++++++++++++++++++//
 //======== SETUP FUNCTION ==========//
@@ -104,12 +267,7 @@ function setup() {
   //Creating the canvas
   customCanvas = createCanvas(1300, 700);
   customCanvas.style("z-index: -100");
-
-  //Positioning the canvas 350px down
   customCanvas.position(0, 350);
-  // customCanvas.parent("bottom-container");
-  // customCanvas.position(0,0);
-  // customCanvas.style("z-index: -100");
 
   //These variables will contain the centre of the canvas
   let x0, y0;
@@ -159,38 +317,6 @@ function setup() {
 
   //Getting the DOM element of curl value display
   divValue = document.getElementById("divergence-value");
-
-  //getting record off
-  recordOff = document.getElementById("record-off-icon");
-  recordOff.addEventListener("click", (e) => {
-    recordFlag = 0;
-
-    localStorage.setItem(
-      new Date().toLocaleString(),
-      JSON.stringify(userClickData)
-    );
-    console.log(userClickData);
-  });
-
-  //getting record on
-  recordOn = document.getElementById("record-on-icon");
-  recordOn.addEventListener("click", (e) => {
-    recordFlag = 1;
-
-    userClickData = {
-      vectorFieldEquation: {
-        Pxy: "",
-        Qxy: "",
-      },
-      coordinates: [],
-      vectorFieldValue: [],
-      magnitude: [],
-      curlExpression: "",
-      curlValue: [],
-      divergenceExpression: "",
-      divergenceValue: [],
-    };
-  });
 
   //getting switch-on-off element
   switchOnOff = document.getElementById("switch-on-off");
@@ -538,13 +664,13 @@ function mainVectorFieldPlotter() {
         x2 = x1 + xUnit;
         y2 = y1 + yUnit;
 
-        if (enableScalingFlag == 0) {
+        if (scalingFlagGlobal === false) {
           //scaled to unit vector
           x2_10 = x1_20 + xUnit_12;
           y2_10 = y1_20 + yUnit_12;
         }
 
-        if (enableScalingFlag == 1) {
+        if (scalingFlagGlobal === true) {
           x2_10 = x1_20 + xVal * sliderValue;
           y2_10 = y1_20 + yVal * sliderValue;
         }
@@ -618,8 +744,6 @@ function colourBarAndMagnitude(maxValue) {
 }
 
 function UIEquation() {
-  let extraDensityEnable;
-
   if (checkBoxFlag == 0) {
     sliderGraphics = createSlider(
       sliderValueMin,
@@ -632,10 +756,6 @@ function UIEquation() {
     sliderGraphics.style("width", "220px");
     sliderGraphics.attribute("disabled", "");
     sliderGraphics.input(getSliderValue);
-
-    checkboxScale = createCheckbox("Scaling Factor", false);
-    checkboxScale.position(customCanvas.x + 1130, sliderGraphics.y - 220);
-    checkboxScale.changed(sliderScale);
 
     xyMin = createInput(sliderValueMin);
     xyMin.position(customCanvas.x + 1030, sliderGraphics.y + 30);
@@ -654,10 +774,6 @@ function UIEquation() {
     currentXY.size(50, 20);
     currentXY.attribute("disabled", "");
 
-    checkboxZoom = createCheckbox("Zooming Factor", false);
-    checkboxZoom.position(customCanvas.x + 1130, sliderGraphics.y - 115);
-    checkboxZoom.changed(sliderScaleZoom);
-
     sliderGraphicsZoom = createSlider(
       sliderValueMinZoom,
       sliderValueMaxZoom,
@@ -670,32 +786,6 @@ function UIEquation() {
     sliderGraphicsZoom.input(sliderValueZoomRead);
 
     checkBoxFlag = 1;
-  }
-}
-
-function sliderScaleZoom() {
-  if (this.checked()) {
-    // Re-enable the button
-    sliderGraphicsZoom.removeAttribute("disabled");
-    zoomEnable = 1;
-  } else {
-    // Disable the button
-    sliderGraphicsZoom.attribute("disabled", "");
-    divByij = 1;
-    mulByPx = 1;
-    sliderValueZoom = 1;
-    sliderGraphicsZoom.remove();
-    sliderGraphicsZoom = createSlider(
-      sliderValueMinZoom,
-      sliderValueMaxZoom,
-      sliderValueZoom,
-      stepZoom
-    );
-    sliderGraphicsZoom.position(customCanvas.x + 1025, sliderGraphics.y + 110);
-    sliderGraphicsZoom.style("width", "220px");
-    sliderGraphicsZoom.attribute("disabled", "");
-    sliderGraphicsZoom.input(sliderValueZoomRead);
-    zoomEnable = 0;
   }
 }
 
@@ -831,64 +921,6 @@ function submitButtonPressed() {
   }
 }
 
-//this function inserts the vector field information at user selected points into userClickData object to store it the localStorage
-function saveUserclickData(
-  xInputString,
-  yInputString,
-  xAxis,
-  yAxis,
-  xCoord,
-  yCoord,
-  pxy,
-  qxy,
-  magnitude,
-  curlEq,
-  curlVal,
-  divergenceEq,
-  divergenceVal
-) {
-  //P(x,y) and Q(x,y) expression
-  userClickData.vectorFieldEquation.Pxy = xInputString;
-  userClickData.vectorFieldEquation.Qxy = yInputString;
-
-  //Selected coordinate value (x, y) based on click and custom coordinate input
-  let coordinatesTemp;
-  if (displayBoxFlag == 0) {
-    coordinatesTemp = {
-      x: xAxis,
-      y: yAxis,
-    };
-  } else {
-    coordinatesTemp = {
-      x: xCoord.value,
-      y: yCoord.value,
-    };
-  }
-  userClickData.coordinates.push(coordinatesTemp);
-
-  //P(x,y) and Q(x,y) value at a specific selected point
-  let vectorFieldValueTemp = {
-    PxyValue: pxy.toFixed(6),
-    QxyValue: qxy.toFixed(6),
-  };
-  userClickData.vectorFieldValue.push(vectorFieldValueTemp);
-
-  //magnitude
-  userClickData.magnitude.push(Number(magnitude).toFixed(6));
-
-  //curl equation
-  userClickData.curlExpression = curlEq.text();
-
-  //curl value
-  userClickData.curlValue.push(curlVal);
-
-  //divergence equation
-  userClickData.divergenceExpression = divergenceEq.text();
-
-  //divergence value
-  userClickData.divergenceValue.push(divergenceVal);
-}
-
 // Check and return whether we have clicked inside or outside of the plotting area
 function isMouseClickedInside() {
   let mouseXpos, mouseYpos, Xaxis, Yaxis, xAxis, yAxis;
@@ -946,18 +978,18 @@ function mousePressed() {
         curlE,
         curlV,
         divE,
-        divV,
+        divV
       );
 
       if (magnitude) {
         //if custom coordinate is enabled
-        if (displayBoxFlag == 0) {
+        if (displayBoxFlagGlobal === false) {
           //Drawing a pointer at a point where user has clicked on the vector field
           fill("red");
           circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 8);
           fill("black");
           circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 5);
-        } else if (displayBoxFlag == 1) {
+        } else if (displayBoxFlagGlobal === true) {
           //Drawing a pointer at a point where user has clicked on the vector field
           fill("red");
           circle(
@@ -973,8 +1005,8 @@ function mousePressed() {
           );
         }
         //we are recording the data if recording is enabled
-        if (recordFlag === 1) {
-          saveUserclickData(
+        if (recordFlagGlobal === true) {
+          userClickDataInsertHandler(
             xInputString,
             yInputString,
             xAxis,
@@ -984,10 +1016,10 @@ function mousePressed() {
             pxy,
             qxy,
             magnitude,
-            curlEq,
-            curlVal,
-            divergenceEq,
-            divergenceVal
+            curlE,
+            curlV,
+            divE,
+            divV
           );
         }
       }
@@ -1008,10 +1040,10 @@ function calculateAll(xAxis, yAxis) {
   let x, y, pxy, qxy;
   let magnitude;
 
-  if (displayBoxFlag == 0) {
+  if (displayBoxFlagGlobal === false) {
     x = xAxis;
     y = yAxis;
-  } else if (displayBoxFlag == 1) {
+  } else if (displayBoxFlagGlobal === true) {
     x = xCoord.value;
     y = yCoord.value;
   }
@@ -1028,7 +1060,7 @@ function calculateAll(xAxis, yAxis) {
 
   //calculating magnitude
   if (magnitude != "UNDEF") {
-    magnitude = ((pxy ** 2 + qxy ** 2) ** 0.5).toFixed(6);
+    magnitude = Number(((pxy ** 2 + qxy ** 2) ** 0.5).toFixed(6));
   }
 
   if (Number.isNaN(pxy) || Number.isNaN(qxy)) {
@@ -1090,17 +1122,21 @@ function divergence(xAxis, yAxis) {
 
   //divergence value
   try {
-    if (displayBoxFlag == 1) {
+    if (displayBoxFlagGlobal === true) {
       divergenceVal = Number(
-        nerdamer(divergenceEq, {
-          x: xCoord.value,
-          y: yCoord.value,
-        }).evaluate()
-      ).toFixed(6);
-    } else if (displayBoxFlag == 0) {
+        Number(
+          nerdamer(divergenceEq, {
+            x: xCoord.value,
+            y: yCoord.value,
+          }).evaluate()
+        ).toFixed(6)
+      );
+    } else if (displayBoxFlagGlobal === false) {
       divergenceVal = Number(
-        nerdamer(divergenceEq, { x: xAxis, y: yAxis }).evaluate()
-      ).toFixed(6);
+        Number(
+          nerdamer(divergenceEq, { x: xAxis, y: yAxis }).evaluate()
+        ).toFixed(6)
+      );
     }
   } catch (err) {
     divergenceVal = "UNDEF";
@@ -1145,17 +1181,19 @@ function curl(xAxis, yAxis) {
 
   // curl value
   try {
-    if (displayBoxFlag == 1) {
+    if (displayBoxFlagGlobal === true) {
       curlVal = Number(
-        nerdamer(curlEq, {
-          x: xCoord.value,
-          y: yCoord.value,
-        }).evaluate()
-      ).toFixed(6);
-    } else if (displayBoxFlag == 0) {
+        Number(
+          nerdamer(curlEq, {
+            x: xCoord.value,
+            y: yCoord.value,
+          }).evaluate()
+        ).toFixed(6)
+      );
+    } else if (displayBoxFlagGlobal === false) {
       curlVal = Number(
-        nerdamer(curlEq, { x: xAxis, y: yAxis }).evaluate()
-      ).toFixed(6);
+        Number(nerdamer(curlEq, { x: xAxis, y: yAxis }).evaluate()).toFixed(6)
+      );
     }
   } catch (err) {
     curlVal = "UNDEF";
@@ -1179,15 +1217,15 @@ function displayAllData(
   divV = null
 ) {
   //if dataStatus true then only we have calculated values and we wanna show them otherwise don't
-  if(dataStatus === true) {
-    if (displayBoxFlag == 0) {
+  if (dataStatus === true) {
+    if (displayBoxFlagGlobal === false) {
       coordDisplay.value = `\\left(x,y\\right)=\\left(${xAxis.toFixed(
         3
       )},${yAxis.toFixed(3)}\\right)`;
     }
     //if the custom coordinate check box is checked or enabled
     //we have a flag variable to store the checkbox status
-    if (displayBoxFlag == 1) {
+    if (displayBoxFlagGlobal === true) {
       coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
     }
     //displaying P(x,y) Q(x,y)
@@ -1210,15 +1248,15 @@ function displayAllData(
     //displaying the divergence value by assigning it to proper DOM element
     divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=
     {${divV}`;
-  }else {
-    if (displayBoxFlag == 0) {
+  } else {
+    if (displayBoxFlagGlobal === false) {
       coordDisplay.value = `\\left(x,y\\right)=\\left(${xAxis.toFixed(
         3
       )},${yAxis.toFixed(3)}\\right)`;
     }
     //if the custom coordinate check box is checked or enabled
     //we have a flag variable to store the checkbox status
-    if (displayBoxFlag == 1) {
+    if (displayBoxFlagGlobal === true) {
       coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
     }
   }
@@ -1227,41 +1265,25 @@ function displayAllData(
 //This function is called and ran on every click on the display enable/disable checkbox
 function enableCustomCoordinate() {
   //If the button is checked
-  if (displayBoxFlag == 0) {
+  if (displayBoxFlagGlobal === false) {
     //first assigning the previously selected coordinate values of non editable elements to the editable elements so that we can show the same values to the editable elemets that of non editable elements
     xCoord.value = xAxisGlobal;
     yCoord.value = yAxisGlobal;
     //setting the flag variable to 1 or true
-    displayBoxFlag = 1;
+    displayBoxFlagGlobal = true;
     //showing the element when custom coordinate box is checked
     customCoordDiv.style.display = "block";
     //hiding the element when custom coordinate box is checked
     coordDisplayDiv.style.display = "none";
   } else {
     //setting the flag variable to 0 or false
-    displayBoxFlag = 0;
+    displayBoxFlagGlobal = false;
 
     //hiding the element agian when custom coordinate box is unchecked
     customCoordDiv.style.display = "none";
 
     //showing the element again when custom coordinate box is unchecked
     coordDisplayDiv.style.display = "block";
-  }
-}
-
-function sliderScale() {
-  if (this.checked()) {
-    // Re-enable the button
-    sliderGraphics.removeAttribute("disabled");
-    xyMax.removeAttribute("disabled");
-    xyMin.removeAttribute("disabled");
-    enableScalingFlag = 1;
-  } else {
-    // Disable the button
-    sliderGraphics.attribute("disabled", "");
-    xyMax.attribute("disabled", "");
-    xyMin.attribute("disabled", "");
-    enableScalingFlag = 0;
   }
 }
 

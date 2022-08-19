@@ -42,6 +42,7 @@
         />
       </div>
     </div>
+    <!-- =============================================== -->
 
     <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <!-- ++++++++++++++ MAIN CONTAINER +++++++++ -->
@@ -86,9 +87,7 @@
       <!-- +++++++++++ CONTROL MENU BAR ++++++ -->
       <!-- +++++++++++++++++++++++++++++++++++++++ -->
       <div id="control-menu-bar">
-        <!-- +++++++++++++++++++++++++++++++++++++++ -->
         <!-- +++++++++++ RECORD ON OFF ++++++ -->
-        <!-- +++++++++++++++++++++++++++++++++++++++ -->
         <div id="record-on-off">
           <div
             id="record-off-icon"
@@ -101,7 +100,7 @@
           document.getElementById('record-on-icon').style.display = 'none';"
           ></div>
         </div>
-
+        <!-- +++++++++++ CUSTOM COORDINATE ON OFF ++++++ -->
         <div id="switch-on-off">
           <div
             id="switch-off-icon"
@@ -114,7 +113,34 @@
           document.getElementById('switch-on-icon').style.display = 'none';"
           ></div>
         </div>
+        <!-- +++++++++++ SCALING ON OFF ++++++ -->
+        <div id="scale-on-off">
+          <div
+            id="scale-off-icon"
+            onclick="document.getElementById('scale-off-icon').style.display = 'none';
+          document.getElementById('scale-on-icon').style.display = 'block';"
+          ></div>
+          <div
+            id="scale-on-icon"
+            onclick="document.getElementById('scale-off-icon').style.display = 'block';
+          document.getElementById('scale-on-icon').style.display = 'none';"
+          ></div>
+        </div>
+        <!-- +++++++++++ ZOOMING ON OFF ++++++ -->
+        <div id="zoom-on-off">
+          <div
+            id="zoom-off-icon"
+            onclick="document.getElementById('zoom-off-icon').style.display = 'none';
+          document.getElementById('zoom-on-icon').style.display = 'block';"
+          ></div>
+          <div
+            id="zoom-on-icon"
+            onclick="document.getElementById('zoom-off-icon').style.display = 'block';
+          document.getElementById('zoom-on-icon').style.display = 'none';"
+          ></div>
+        </div>
       </div>
+      <!-- ================================================================================= -->
 
       <!-- +++++++++++++++++++++++++++++++++++++++ -->
       <!-- +++++++++++ BOTTOM SUB-CONTAINER ++++++ -->
@@ -193,6 +219,7 @@
         </div>
       </div>
     </div>
+    <!-- ===================================================================== -->
 
     <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <!-- +++++++++++ MODAL and BACKDROP ++++++++ -->
@@ -207,7 +234,8 @@
       </div>
     </div>
   </body>
-
+  <!-- =========================================================== -->
+  
   <!-- Importing main sketch JavaScript file -->
   <script
     language="javascript"

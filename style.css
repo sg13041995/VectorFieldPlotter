@@ -317,7 +317,6 @@ body {
 #record-on-off {
   width: fit-content;
   margin: auto;
-
   background-image: linear-gradient(to top, #d8d9db 0%, #fff 80%, #fdfdfd 100%);
   border-radius: 30px;
   border: 1px solid #8f9092;
@@ -327,33 +326,25 @@ body {
 }
 
 #record-off-icon {
-  content: url("./image/pause_mouse_out.png");
+  display: block;
+  content: url("./image/pause.png");
   cursor: pointer;
-  display: none;
-}
-
-#record-off-icon:hover {
-  content: url("./image/pause_mouse_in.png");
 }
 
 #record-on-icon {
-  content: url("./image/play_mouse_out.png");
+  display: none;
+  content: url("./image/play.png");
   cursor: pointer;
-  display: block;
 }
 
-#record-on-icon:hover {
-  content: url("./image/play_mouse_in.png");
-}
-
-/* ++++++++++++++ RECORD ON OFF ++++++++++++++ */
+/* ++++++++++++++ SWITCH ON OFF ++++++++++++++ */
 
 #switch-on-off {
   width: fit-content;
   margin: auto;
 
   background-image: linear-gradient(to top, #d8d9db 0%, #fff 80%, #fdfdfd 100%);
-  border-radius: 7px;
+  border-radius: 30px;
   border: 1px solid #8f9092;
   /* convex effect */
   box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
@@ -361,21 +352,65 @@ body {
 }
 
 #switch-off-icon {
-  content: url("./image/toggle_off_out.png");
+  content: url("./image/switch_off.png");
   cursor: pointer;
   display: block;
 }
 
-#switch-off-icon:hover {
-  content: url("./image/toggle_off_in.png");
-}
-
 #switch-on-icon {
-  content: url("./image/toggle_on_out.png");
+  content: url("./image/switch_on.png");
   cursor: pointer;
   display: none;
 }
 
-#switch-on-icon:hover {
-  content: url("./image/toggle_on_in.png");
+/* ++++++++++++++ SCALE ON OFF ++++++++++++++ */
+
+#scale-on-off {
+  width: fit-content;
+  margin: auto;
+
+  background-image: linear-gradient(to top, #d8d9db 0%, #fff 80%, #fdfdfd 100%);
+  border-radius: 10px;
+  border: 1px solid #8f9092;
+  /* convex effect */
+  box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
+    0 -6px 4px #fefefe, inset 0 0 3px 0 #cecfd1;
+}
+
+#scale-off-icon {
+  content: url("./image/scale_off.png");
+  cursor: pointer;
+  display: block;
+}
+
+#scale-on-icon {
+  content: url("./image/scale_on.png");
+  cursor: pointer;
+  display: none;
+}
+
+/* ++++++++++++++ ZOOM ON OFF ++++++++++++++ */
+
+#zoom-on-off {
+  width: fit-content;
+  margin: auto;
+
+  background-image: linear-gradient(to top, #d8d9db 0%, #fff 80%, #fdfdfd 100%);
+  border-radius: 10px;
+  border: 1px solid #8f9092;
+  /* convex effect */
+  box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
+    0 -6px 4px #fefefe, inset 0 0 3px 0 #cecfd1;
+}
+
+#zoom-off-icon {
+  content: url("./image/zoom_off.png");
+  cursor: pointer;
+  display: block;
+}
+
+#zoom-on-icon {
+  content: url("./image/zoom_on.png");
+  cursor: pointer;
+  display: none;
 }
