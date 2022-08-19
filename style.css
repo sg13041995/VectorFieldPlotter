@@ -233,7 +233,7 @@ body {
   font-weight: 600;
   background-color: white;
   margin: auto;
-  padding: 5px 10px 5px 10px;
+  padding: 25px 25px 25px 25px;
   border: none;
   width: 30%;
   border-radius: 0px 0px 8px 8px;
@@ -300,6 +300,7 @@ body {
 /* ++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #control-menu-bar {
+  display: flex;
   height: fit-content;
   margin: 10px;
 
@@ -343,4 +344,38 @@ body {
 
 #record-on-icon:hover {
   content: url("./image/play_mouse_in.png");
+}
+
+/* ++++++++++++++ RECORD ON OFF ++++++++++++++ */
+
+#switch-on-off {
+  width: fit-content;
+  margin: auto;
+
+  background-image: linear-gradient(to top, #d8d9db 0%, #fff 80%, #fdfdfd 100%);
+  border-radius: 7px;
+  border: 1px solid #8f9092;
+  /* convex effect */
+  box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
+    0 -6px 4px #fefefe, inset 0 0 3px 0 #cecfd1;
+}
+
+#switch-off-icon {
+  content: url("./image/toggle_off_out.png");
+  cursor: pointer;
+  display: block;
+}
+
+#switch-off-icon:hover {
+  content: url("./image/toggle_off_in.png");
+}
+
+#switch-on-icon {
+  content: url("./image/toggle_on_out.png");
+  cursor: pointer;
+  display: none;
+}
+
+#switch-on-icon:hover {
+  content: url("./image/toggle_on_in.png");
 }

@@ -64,8 +64,7 @@ let coordDisplay, coordDisplayDiv;
 let xCoord, yCoord;
 //custom coordinate div holds the custom user input fields of x-coordinate and y-coordinate
 let customCoordDiv;
-//This is a flag variable to store the custom coordinate enable/ disable checkbox status
-let displayBoxFlag = 0;
+
 //This element will hold the instance of pxy DOM element which holds the value of P(x,y) at a specific point
 let pOfXy;
 //This element will hold the instance of qxy DOM element which holds the value of Q(x,y) at a specific point
@@ -76,29 +75,22 @@ let magnitudeVal;
 let curlEqu, curlValue;
 //This will hold the divergence equation and value
 let divEqu, divValue;
-//This is a checkbox for enabling custom coordinate
-let checkbox;
 //If the custom coordinate checkbox is enabled then this variable will become 1 else 0
 //So by default the value is zero1
 let checkBoxFlag = 0;
-//xAxis and yAxis is the x and y value of a point on the coordinate system selected with our mouse click or entered with custom coordinate math-field element
-//It is the point at which we will calculate all the vector filed properties
-let xAxis = 0,
-  yAxis = 0;
-//This variable will be responsible for providing additional density
-let extraDensity = 1;
-//pxy and qxy means P(x,y) and Q(x,y) value
-let pxy, qxy;
-//dp/dx, dp/dy and thier values, divergence equation and value
-let pDx, qDy, pDxVal, qDyVal, divergenceEq, divergenceVal;
-//dp/dy, dq/dx and thier values, curl equation and value
-let pDy, qDx, pDyVal, qDxVal, curlEq, curlVal;
 //modal <div>, modal-text <p> and Close button <span>
 let modal, modalBody, span, modalHeader;
 //variables for record on off elements
 let recordOff,
   recordOn,
   recordFlag = 0;
+//switch-on-off div reference
+let switchOnOff;
+//This is a flag variable to store the custom coordinate enable/ disable checkbox status
+let displayBoxFlag = 0;
+let xAxisGlobal = 0,
+  yAxisGlobal = 0;
+
 //object for storing user click data
 let userClickData;
 let enableScalingFlag = 0,
@@ -199,6 +191,10 @@ function setup() {
       divergenceValue: [],
     };
   });
+
+  //getting switch-on-off element
+  switchOnOff = document.getElementById("switch-on-off");
+  switchOnOff.addEventListener("click", enableCustomCoordinate);
 
   //Getting the xInput and yInput element from DOM and configuring it to have the virtual keyboard
   xInput = document.getElementById("x-input");
@@ -493,12 +489,8 @@ function mainVectorFieldPlotter() {
   ijValLow = 15 / divByij;
   ijValHigh = 15 / divByij;
 
-  for (i = -ijValLow; i <= ijValHigh + 0.001; i += 1 / divByij / extraDensity) {
-    for (
-      j = -ijValLow;
-      j <= ijValHigh + 0.001;
-      j += 1 / divByij / extraDensity
-    ) {
+  for (i = -ijValLow; i <= ijValHigh + 0.001; i += 1 / divByij) {
+    for (j = -ijValLow; j <= ijValHigh + 0.001; j += 1 / divByij) {
       //Here, (x1,y1) = (x,y) of the coordinate point
       //x1=x, y1=y axis value of the selected coordinate point
       x1 = i;
@@ -629,10 +621,6 @@ function UIEquation() {
   let extraDensityEnable;
 
   if (checkBoxFlag == 0) {
-    checkbox = createCheckbox("Enable Custom Coordinate", false);
-    checkbox.position(customCanvas.x + 1130, customCanvas.y + 20);
-    checkbox.changed(enableButton);
-
     sliderGraphics = createSlider(
       sliderValueMin,
       sliderValueMax,
@@ -681,22 +669,7 @@ function UIEquation() {
     sliderGraphicsZoom.attribute("disabled", "");
     sliderGraphicsZoom.input(sliderValueZoomRead);
 
-    extraDensityEnable = createCheckbox("Density++", false);
-    extraDensityEnable.position(customCanvas.x + 1130, customCanvas.y + 110);
-    extraDensityEnable.changed(extraDensityEnableFunc);
-
     checkBoxFlag = 1;
-  }
-  displayData();
-}
-
-function extraDensityEnableFunc() {
-  if (this.checked()) {
-    // Re-enable the button
-    extraDensity = 1.2;
-  } else {
-    // Disable the button
-    extraDensity = 1;
   }
 }
 
@@ -776,7 +749,6 @@ function submitButtonPressed() {
       }
     }
   } catch (err) {
-    // console.log(err);
     errorString += err;
   }
   //at +,+
@@ -793,7 +765,6 @@ function submitButtonPressed() {
       }
     }
   } catch (err) {
-    // console.log(err);
     errorString += err;
   }
   //at +,-
@@ -810,7 +781,6 @@ function submitButtonPressed() {
       }
     }
   } catch (err) {
-    // console.log(err);
     errorString += err;
   }
   //at -,-
@@ -827,7 +797,6 @@ function submitButtonPressed() {
       }
     }
   } catch (err) {
-    // console.log(err);
     errorString += err;
   }
   //at -,+
@@ -844,7 +813,6 @@ function submitButtonPressed() {
       }
     }
   } catch (err) {
-    // console.log(err);
     errorString += err;
   }
 
@@ -921,65 +889,9 @@ function saveUserclickData(
   userClickData.divergenceValue.push(divergenceVal);
 }
 
-//When mouse clicked
-function mousePressed() {
-  //mouse position returns a boolean value
-  //true/false based on whether we have clicked inside or outside the plotting area
-  let isClickedInside = mousePosition();
-
-  if (isClickedInside) {
-    //calculating the values with selected point
-    let magnitude = calculatePQ();
-    //rendering the updated values
-    displayData();
-    if (magnitude) {
-      //if custom coordinate is enabled
-      if (displayBoxFlag == 0) {
-        //Drawing a pointer at a point where user has clicked on the vector field
-        fill("red");
-        circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 8);
-        fill("black");
-        circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 5);
-      } else if (displayBoxFlag == 1) {
-        //Drawing a pointer at a point where user has clicked on the vector field
-        fill("red");
-        circle(
-          xCoord.value * (20 * mulByPx),
-          -yCoord.value * (20 * mulByPx),
-          8
-        );
-        fill("black");
-        circle(
-          xCoord.value * (20 * mulByPx),
-          -yCoord.value * (20 * mulByPx),
-          5
-        );
-      }
-      //we are recording the data if recording is enabled
-      if (recordFlag === 1) {
-        saveUserclickData(
-          xInputString,
-          yInputString,
-          xAxis,
-          yAxis,
-          xCoord,
-          yCoord,
-          pxy,
-          qxy,
-          magnitude,
-          curlEq,
-          curlVal,
-          divergenceEq,
-          divergenceVal
-        );
-      }
-    }
-  }
-}
-
 // Check and return whether we have clicked inside or outside of the plotting area
-function mousePosition() {
-  let mouseXpos, mouseYpos, Xaxis, Yaxis;
+function isMouseClickedInside() {
+  let mouseXpos, mouseYpos, Xaxis, Yaxis, xAxis, yAxis;
   //indicated whether our mouse click in inside or outside the vector field plotting area
   let isClickedInside = false;
   if (mouseIsPressed) {
@@ -995,21 +907,105 @@ function mousePosition() {
       Yaxis <= 15.99 / divByij
     ) {
       //recording the click coordinate according to our plotting area
-      xAxis = Xaxis.toFixed(3);
-      yAxis = Yaxis.toFixed(3);
+      xAxis = Xaxis;
+      yAxis = Yaxis;
       isClickedInside = true;
-      return isClickedInside;
+      return [xAxis, yAxis, isClickedInside];
     } else {
       isClickedInside = false;
-      return isClickedInside;
+      return [0, 0, isClickedInside];
     }
   }
 }
 
-//calculates P(x,y);Q(x,y);magnitude;
-//display P(x,y);Q(x,y);curlEq;CurlVal;DivEq;DivVal;
-function calculatePQ() {
-  let x, y;
+//triggers on mouse click
+//calls isMouseClickedInside() and gets the coordinates
+function mousePressed() {
+  //returns an array [x, y, isClickedInside]
+  let [xAxis, yAxis, isClickedInside] = isMouseClickedInside();
+
+  //if we have clicked inside
+  if (isClickedInside) {
+    xAxisGlobal = xAxis;
+    yAxisGlobal = yAxis;
+
+    //calling and getting all the calculated values
+    let returnCalculateAll = calculateAll(xAxis, yAxis);
+
+    if (returnCalculateAll) {
+      let [pxy, qxy, magnitude, curlE, curlV, divE, divV] = returnCalculateAll;
+      //calling to render all the calculated values
+      displayAllData(
+        xAxis,
+        yAxis,
+        //dataStatus = true
+        true,
+        pxy,
+        qxy,
+        magnitude,
+        curlE,
+        curlV,
+        divE,
+        divV,
+      );
+
+      if (magnitude) {
+        //if custom coordinate is enabled
+        if (displayBoxFlag == 0) {
+          //Drawing a pointer at a point where user has clicked on the vector field
+          fill("red");
+          circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 8);
+          fill("black");
+          circle(xAxis * (20 * mulByPx), -yAxis * (20 * mulByPx), 5);
+        } else if (displayBoxFlag == 1) {
+          //Drawing a pointer at a point where user has clicked on the vector field
+          fill("red");
+          circle(
+            xCoord.value * (20 * mulByPx),
+            -yCoord.value * (20 * mulByPx),
+            8
+          );
+          fill("black");
+          circle(
+            xCoord.value * (20 * mulByPx),
+            -yCoord.value * (20 * mulByPx),
+            5
+          );
+        }
+        //we are recording the data if recording is enabled
+        if (recordFlag === 1) {
+          saveUserclickData(
+            xInputString,
+            yInputString,
+            xAxis,
+            yAxis,
+            xCoord,
+            yCoord,
+            pxy,
+            qxy,
+            magnitude,
+            curlEq,
+            curlVal,
+            divergenceEq,
+            divergenceVal
+          );
+        }
+      }
+    } else {
+      displayAllData(
+        xAxis,
+        yAxis,
+        //dataStatus = false
+        false
+      );
+    }
+  }
+}
+
+//calculates P(x,y);Q(x,y);Magnitude;
+//calls divergence(); and curl(); and get their values
+function calculateAll(xAxis, yAxis) {
+  let x, y, pxy, qxy;
   let magnitude;
 
   if (displayBoxFlag == 0) {
@@ -1020,6 +1016,7 @@ function calculatePQ() {
     y = yCoord.value;
   }
 
+  //calculating P(x,y) and Q(x,y)
   try {
     pxy = Number(nerdamer(xInputString, { x: x, y: y }).evaluate());
     qxy = Number(nerdamer(yInputString, { x: x, y: y }).evaluate());
@@ -1029,12 +1026,10 @@ function calculatePQ() {
     magnitude = "UNDEF";
   }
 
+  //calculating magnitude
   if (magnitude != "UNDEF") {
     magnitude = ((pxy ** 2 + qxy ** 2) ** 0.5).toFixed(6);
   }
-
-  console.log(typeof pxy, typeof qxy);
-  
 
   if (Number.isNaN(pxy) || Number.isNaN(qxy)) {
     let message = "";
@@ -1053,51 +1048,45 @@ function calculatePQ() {
   }
 
   //for calculating curl and divergence, we are calling two different functions
-  let [divE, divV] = divergence();
-  let [curlE, curlV] = curl();
+  let [divE, divV] = divergence(xAxis, yAxis);
+  let [curlE, curlV] = curl(xAxis, yAxis);
 
-  // console.log("div and curl done");
-
-  if (pxy != "UNDEF" || qxy != "UNDEF") {
-    //displaying P(x,y) Q(x,y)
-    pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy.toFixed(6)}`;
-    qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy.toFixed(6)}`;
-  } else {
-    //displaying P(x,y) Q(x,y)
-    pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy}`;
-    qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy}`;
-  }
-
-  //calculating and displaying magnitude
-  magnitudeVal.value = `\\sqrt{P^2+Q^2}=${magnitude}`;
-
-  //displaying the curl equation by assigning it to proper DOM element
-  curlEqu.value = curlE.toTeX();
-
-  //displaying the div value by assigning it to proper DOM element
-  curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=
-  ${curlV}`;
-
-  //displaying the div equation by assigning it to proper DOM element
-  divEqu.value = divE.toTeX();
-
-  //displaying the divergence value by assigning it to proper DOM element
-  divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=
-  {${divV}`;
-
-  return magnitude;
+  return [pxy, qxy, magnitude, curlE, curlV, divE, divV];
 }
 
 //calculates and return divergence equation and value
-function divergence() {
-  // console.log("div called");
+function divergence(xAxis, yAxis) {
+  let divergenceVal;
+  let pDx, qDy;
 
-  //partial differentiation
-  pDx = nerdamer.diff(xInputString, "x");
-  qDy = nerdamer.diff(yInputString, "y");
+  //replacing sqrt(y) in xInputString with P before derivative
+  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
+  let checkResultP = xInputString.match(/sqrt\(y\)/g);
+  if (checkResultP != null) {
+    let replacedXInputString = xInputString.replace(/sqrt\(y\)/g, "P");
+    //doing derivative
+    pDx = nerdamer.diff(replacedXInputString, "x");
+    //replacing P in pDy with sqrt(x) after derivative
+    pDx = pDx.text().replace(/P/g, "sqrt(y)");
+  } else {
+    pDx = nerdamer.diff(xInputString, "x");
+  }
+
+  //replacing sqrt(x) in yInputString with Q before derivative
+  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
+  let checkResultQ = yInputString.match(/sqrt\(x\)/g);
+  if (checkResultQ != null) {
+    let replacedYInputString = yInputString.replace(/sqrt\(x\)/g, "Q");
+    //doing derivative
+    qDy = nerdamer.diff(replacedYInputString, "y");
+    //replacing Q in qDy with sqrt(x) after derivative
+    qDy = qDy.text().replace(/Q/g, "sqrt(x)");
+  } else {
+    qDy = nerdamer.diff(yInputString, "y");
+  }
 
   //divergence equation
-  divergenceEq = nerdamer(pDx).add(qDy);
+  let divergenceEq = nerdamer(pDx).add(qDy);
 
   //divergence value
   try {
@@ -1121,12 +1110,39 @@ function divergence() {
 }
 
 //calculates and return curl equation and value
-function curl() {
-  //partial differentiation
-  qDx = nerdamer.diff(yInputString, "x");
-  pDy = nerdamer.diff(xInputString, "y");
+function curl(xAxis, yAxis) {
+  let pDy, qDx;
+  let curlVal;
+
+  //replacing sqrt(x) in xInputString with P before derivative
+  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
+  let checkResultP = xInputString.match(/sqrt\(x\)/g);
+  if (checkResultP != null) {
+    let replacedXInputString = xInputString.replace(/sqrt\(x\)/g, "P");
+    //doing derivative
+    pDy = nerdamer.diff(replacedXInputString, "y");
+    //replacing P in pDy with sqrt(x) after derivative
+    pDy = pDy.text().replace(/P/g, "sqrt(x)");
+  } else {
+    pDy = nerdamer.diff(xInputString, "y");
+  }
+
+  //replacing sqrt(y) in yInputString with Q before derivative
+  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
+  let checkResultQ = yInputString.match(/sqrt\(y\)/g);
+  if (checkResultQ != null) {
+    let replacedYInputString = yInputString.replace(/sqrt\(y\)/g, "Q");
+    //doing derivative
+    qDx = nerdamer.diff(replacedYInputString, "x");
+    //replacing Q in qDx with sqrt(y) after derivative
+    qDx = qDx.text().replace(/Q/g, "sqrt(y)");
+  } else {
+    qDx = nerdamer.diff(yInputString, "x");
+  }
+
   //curl equation
-  curlEq = nerdamer(qDx).subtract(pDy);
+  let curlEq = nerdamer(qDx).subtract(pDy);
+
   // curl value
   try {
     if (displayBoxFlag == 1) {
@@ -1148,42 +1164,80 @@ function curl() {
   return [curlEq, curlVal];
 }
 
-//This function is responsible to inject and display the coordinate values on the respective DOM elements based on the state of custom coordinate enable/ disable check box
-function displayData() {
-  //if the custom coordinate check box is not checked or disabled
-  //we have a flag variable to store the checkbox status
-  if (displayBoxFlag == 0) {
-    coordDisplay.value = `\\left(x,y\\right)=\\left(${xAxis},${yAxis}\\right)`;
-  }
-
-  //if the custom coordinate check box is checked or enabled
-  //we have a flag variable to store the checkbox status
-  if (displayBoxFlag == 1) {
-    coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
+//display the following data
+//(x,y);P(x,y);Q(x,y);Magnitude;Curl Eq;Curl Val;Divergence Eq;Divergence Val
+function displayAllData(
+  xAxis,
+  yAxis,
+  dataStatus,
+  pxy = null,
+  qxy = null,
+  magnitude = null,
+  curlE = null,
+  curlV = null,
+  divE = null,
+  divV = null
+) {
+  //if dataStatus true then only we have calculated values and we wanna show them otherwise don't
+  if(dataStatus === true) {
+    if (displayBoxFlag == 0) {
+      coordDisplay.value = `\\left(x,y\\right)=\\left(${xAxis.toFixed(
+        3
+      )},${yAxis.toFixed(3)}\\right)`;
+    }
+    //if the custom coordinate check box is checked or enabled
+    //we have a flag variable to store the checkbox status
+    if (displayBoxFlag == 1) {
+      coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
+    }
+    //displaying P(x,y) Q(x,y)
+    if (pxy != "UNDEF" || qxy != "UNDEF") {
+      pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy.toFixed(6)}`;
+      qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy.toFixed(6)}`;
+    } else {
+      pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy}`;
+      qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy}`;
+    }
+    //displaying magnitude
+    magnitudeVal.value = `\\sqrt{P^2+Q^2}=${magnitude}`;
+    //displaying the curl equation by assigning it to proper DOM element
+    curlEqu.value = curlE.toTeX();
+    //displaying the div value by assigning it to proper DOM element
+    curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=
+    ${curlV}`;
+    //displaying the div equation by assigning it to proper DOM element
+    divEqu.value = divE.toTeX();
+    //displaying the divergence value by assigning it to proper DOM element
+    divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=
+    {${divV}`;
+  }else {
+    if (displayBoxFlag == 0) {
+      coordDisplay.value = `\\left(x,y\\right)=\\left(${xAxis.toFixed(
+        3
+      )},${yAxis.toFixed(3)}\\right)`;
+    }
+    //if the custom coordinate check box is checked or enabled
+    //we have a flag variable to store the checkbox status
+    if (displayBoxFlag == 1) {
+      coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
+    }
   }
 }
 
 //This function is called and ran on every click on the display enable/disable checkbox
-function enableButton() {
+function enableCustomCoordinate() {
   //If the button is checked
-  if (this.checked()) {
+  if (displayBoxFlag == 0) {
     //first assigning the previously selected coordinate values of non editable elements to the editable elements so that we can show the same values to the editable elemets that of non editable elements
-    xCoord.value = xAxis;
-    yCoord.value = yAxis;
-
+    xCoord.value = xAxisGlobal;
+    yCoord.value = yAxisGlobal;
     //setting the flag variable to 1 or true
     displayBoxFlag = 1;
-
     //showing the element when custom coordinate box is checked
     customCoordDiv.style.display = "block";
-
     //hiding the element when custom coordinate box is checked
     coordDisplayDiv.style.display = "none";
   } else {
-    //first assigning the previously selected coordinate values of editable elements to the non editable elements so that we can show the same values to the non editable elemets that of editable elements
-    xAxis = xCoord.value;
-    yAxis = yCoord.value;
-
     //setting the flag variable to 0 or false
     displayBoxFlag = 0;
 
