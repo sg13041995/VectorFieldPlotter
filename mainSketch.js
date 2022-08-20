@@ -164,18 +164,12 @@ const userClickDataInsertHandler = (
 //defining scaleOn handler
 const scaleOnHandler = () => {
   document.getElementById("scale-slider-div").style.display = "block";
-  sliderGraphics.removeAttribute("disabled");
-  xyMax.removeAttribute("disabled");
-  xyMin.removeAttribute("disabled");
   scalingFlagGlobal = true;
 };
 // ==================================================================
 //defining scaleOff handler
 const scaleOffHandler = () => {
   document.getElementById("scale-slider-div").style.display = "none";
-  sliderGraphics.attribute("disabled", "");
-  xyMax.attribute("disabled", "");
-  xyMin.attribute("disabled", "");
   scalingFlagGlobal = false;
   runTheCode();
 };
