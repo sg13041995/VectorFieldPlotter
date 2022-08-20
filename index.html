@@ -7,27 +7,33 @@
     <title>
       Vector Field Plotter | Curl Calculator | Divergence Calculator
     </title>
-    <!-- link for favicon -->
+    <!--+++++++++++++++++++++++++++++++ FAVICON +++++++++++++++++++++++++++++++-->
     <link rel="icon" type="image/x-icon" href="./image/favicon.gif" />
-    <!-- importing main CSS file -->
+    <!--++++++++++++++++++++++++++++ IMPORTING MAIN CSS ++++++++++++++++++++++++++++-->
     <link rel="stylesheet" href="./style.css" />
   </head>
 
-  <!-- Importing p5js library through CDN -->
+  <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <!--+++++++++++++++++++++++++ IMPORTING LIBRARIES THROUGH CDN +++++++++++++++++++++++++-->
+  <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <!-- CANVAS -->
+  <!-- p5js -->
   <script
     async
+    defer
     src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"
   ></script>
-
-  <!-- Nerdamer is for complex mathematical calculations like partial differentiation, solving algebric equations etc.  -->
-  <!-- Importing nerdamer library through CDN -->
+  <!-- MATH ENGINE -->
+  <!-- nerdamer -->
   <script
     async
+    defer
     src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/all.min.js"
   ></script>
-
-  <!-- importing MathLive library through CDN -->
-  <script async src="https://unpkg.com/mathlive"></script>
+  <!-- MATH DISPLAY LATEX -->
+  <!-- MathLive -->
+  <script async defer src="https://unpkg.com/mathlive"></script>
+  <!-- =================================================================================== -->
 
   <body>
     <!-- +++++++++++++++++++++++++++++++++++++++ -->
@@ -43,6 +49,14 @@
       </div>
     </div>
     <!-- =============================================== -->
+
+    <!-- Importing main sketch JavaScript file -->
+    <script
+      async
+      language="javascript"
+      type="text/javascript"
+      src="./mainSketch.js"
+    ></script>
 
     <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <!-- ++++++++++++++ MAIN CONTAINER +++++++++ -->
@@ -82,9 +96,10 @@
           <button id="submit-btn">Submit</button>
         </div>
       </div>
+      <!-- ============================================================================ -->
 
       <!-- +++++++++++++++++++++++++++++++++++++++ -->
-      <!-- +++++++++++ CONTROL MENU BAR ++++++ -->
+      <!-- +++++++++++++ CONTROL MENU BAR ++++++++ -->
       <!-- +++++++++++++++++++++++++++++++++++++++ -->
       <div id="control-menu-bar">
         <!-- +++++++++++ RECORD ON OFF ++++++ -->
@@ -218,6 +233,7 @@
           >
         </div>
       </div>
+      <!-- ===================================================================== -->
     </div>
     <!-- ===================================================================== -->
 
@@ -235,11 +251,4 @@
     </div>
   </body>
   <!-- =========================================================== -->
-  
-  <!-- Importing main sketch JavaScript file -->
-  <script
-    language="javascript"
-    type="text/javascript"
-    src="./mainSketch.js"
-  ></script>
 </html>

@@ -615,8 +615,18 @@ function mainVectorFieldPlotter() {
   ijValLow = 15 / divByij;
   ijValHigh = 15 / divByij;
 
+  let sqrtOfXInP = xInputString.match(/sqrt\(x\)/g);
+  let sqrtOfXInQ = yInputString.match(/sqrt\(x\)/g);
+  let sqrtOfYInP = xInputString.match(/sqrt\(y\)/g);
+  let sqrtOfYInQ = yInputString.match(/sqrt\(y\)/g);
+
+  let isValidPoint;
+
   for (i = -ijValLow; i <= ijValHigh + 0.001; i += 1 / divByij) {
     for (j = -ijValLow; j <= ijValHigh + 0.001; j += 1 / divByij) {
+
+      isValidPoint = true;
+
       //Here, (x1,y1) = (x,y) of the coordinate point
       //x1=x, y1=y axis value of the selected coordinate point
       x1 = i;
@@ -638,11 +648,25 @@ function mainVectorFieldPlotter() {
         // console.log("Division by 0 is not allowed - mainVectorFieldPlotter");
         continue;
       }
+  
+      if (sqrtOfXInP != null && (x1 < 0)) {
+        isValidPoint = false;
 
-      if (Number.isNaN(xVal) || Number.isNaN(yVal)) {
-        // console.log("Please Check the expression - mainVectorFieldPlotter");
+      } else if (sqrtOfXInQ != null && (x1 < 0)) {
+        isValidPoint = false;
+
+      } else if (sqrtOfYInP != null && (y1 < 0)) {
+        isValidPoint = false;
+
+      } else if (sqrtOfYInQ != null && (y1 < 0)) {
+        isValidPoint = false;
+
       }
-
+    
+      if (!isValidPoint) {
+        continue;        
+      }
+      
       //calculating the magnitude
       magnitude = (xVal ** 2 + yVal ** 2) ** 0.5;
 
@@ -1051,9 +1075,13 @@ function calculateAll(xAxis, yAxis) {
   //calculating P(x,y) and Q(x,y)
   try {
     pxy = Number(nerdamer(xInputString, { x: x, y: y }).evaluate());
-    qxy = Number(nerdamer(yInputString, { x: x, y: y }).evaluate());
   } catch (err) {
     pxy = "UNDEF";
+    magnitude = "UNDEF";
+  }
+  try {
+    qxy = Number(nerdamer(yInputString, { x: x, y: y }).evaluate());
+  } catch (err) {
     qxy = "UNDEF";
     magnitude = "UNDEF";
   }
@@ -1063,17 +1091,25 @@ function calculateAll(xAxis, yAxis) {
     magnitude = Number(((pxy ** 2 + qxy ** 2) ** 0.5).toFixed(6));
   }
 
-  if (Number.isNaN(pxy) || Number.isNaN(qxy)) {
-    let message = "";
-    if (Number.isNaN(pxy) && Number.isNaN(qxy)) {
-      message =
-        "P(x,y) and Q(x,y) are not valid at the selected coordinate point";
-    } else if (Number.isNaN(pxy)) {
-      message = "P(x,y) is not valid at the selected coordinate point";
-    } else {
-      message = "Q(x,y) is not valid at the selected coordinate point";
-    }
-    modalBody.innerText = `${message}`;
+  let sqrtOfXInP = xInputString.match(/sqrt\(x\)/g);
+  let sqrtOfXInQ = yInputString.match(/sqrt\(x\)/g);
+  let sqrtOfYInP = xInputString.match(/sqrt\(y\)/g);
+  let sqrtOfYInQ = yInputString.match(/sqrt\(y\)/g);
+
+  let validityMessage = false;
+
+  if (sqrtOfXInP != null && x < 0) {
+    validityMessage = "P(x,y) is not valid at -x coordinate";
+  } else if (sqrtOfXInQ != null && x < 0) {
+    validityMessage = "Q(x,y) is not valid at -x coordinate";
+  } else if (sqrtOfYInP != null && y < 0) {
+    validityMessage = "P(x,y) is not valid at -y coordinate";
+  } else if (sqrtOfYInQ != null && y < 0) {
+    validityMessage = "Q(x,y) is not valid at -y coordinate";
+  }
+
+  if (validityMessage) {
+    modalBody.innerText = `${validityMessage}`;
     modalHeader.innerHTML = "ATTENTION!";
     modal.style.display = "block";
     return false;
@@ -1229,12 +1265,12 @@ function displayAllData(
       coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
     }
     //displaying P(x,y) Q(x,y)
-    if (pxy != "UNDEF" || qxy != "UNDEF") {
-      pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy.toFixed(6)}`;
-      qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy.toFixed(6)}`;
-    } else {
+    if (pxy === "UNDEF" || qxy === "UNDEF") {
       pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy}`;
       qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy}`;
+    } else {
+      pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy.toFixed(6)}`;
+      qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy.toFixed(6)}`;
     }
     //displaying magnitude
     magnitudeVal.value = `\\sqrt{P^2+Q^2}=${magnitude}`;
