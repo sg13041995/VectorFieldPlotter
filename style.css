@@ -375,6 +375,8 @@ body {
   /* convex effect */
   box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
     0 -6px 4px #fefefe, inset 0 0 3px 0 #cecfd1;
+
+  position: relative;
 }
 
 #scale-off-icon {
@@ -389,6 +391,25 @@ body {
   display: none;
 }
 
+#scale-slider-div {
+  display: none;
+  position: absolute;
+  
+  background-image: linear-gradient(to top, #b6afb0 0%, #fff 80%, #fdfdfd 100%);
+  border-radius: 10px;
+  border: 1px solid #8f9092;
+  
+  width: fit-content;
+  padding: 0.5rem;
+  
+  left: -74px;
+  top: -59px;
+}
+
+#scale-slider {
+  width: 10rem;
+}
+
 /* ++++++++++++++ ZOOM ON OFF ++++++++++++++ */
 
 #zoom-on-off {
@@ -401,6 +422,8 @@ body {
   /* convex effect */
   box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
     0 -6px 4px #fefefe, inset 0 0 3px 0 #cecfd1;
+
+    position: relative;
 }
 
 #zoom-off-icon {
@@ -413,4 +436,23 @@ body {
   content: url("./image/zoom_on.png");
   cursor: pointer;
   display: none;
+}
+
+#zoom-slider-div {
+  display: none;
+  position: absolute;
+  
+  background-image: linear-gradient(to top, #b6afb0 0%, #fff 80%, #fdfdfd 100%);
+  border-radius: 10px;
+  border: 1px solid #8f9092;
+  
+  width: fit-content;
+  padding: 0.5rem;
+  
+  left: -74px;
+  top: -59px;
+}
+
+#zoom-slider {
+  width: 10rem;
 }

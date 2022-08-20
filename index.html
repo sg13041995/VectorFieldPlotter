@@ -102,6 +102,29 @@
       <!-- +++++++++++++ CONTROL MENU BAR ++++++++ -->
       <!-- +++++++++++++++++++++++++++++++++++++++ -->
       <div id="control-menu-bar">
+        <!-- +++++++++++ SCALING ON OFF ++++++ -->
+        <div id="scale-on-off">
+          <div
+            id="scale-off-icon"
+            onclick="document.getElementById('scale-off-icon').style.display = 'none';
+                  document.getElementById('scale-on-icon').style.display = 'block';"
+          ></div>
+          <div
+            id="scale-on-icon"
+            onclick="document.getElementById('scale-off-icon').style.display = 'block';
+                  document.getElementById('scale-on-icon').style.display = 'none';"
+          ></div>
+          <div id="scale-slider-div">
+            <input
+              id="scale-slider"
+              type="range"
+              min="0.01"
+              max="20"
+              value="10"
+              step="0.2"
+            />
+          </div>
+        </div>
         <!-- +++++++++++ RECORD ON OFF ++++++ -->
         <div id="record-on-off">
           <div
@@ -128,19 +151,6 @@
           document.getElementById('switch-on-icon').style.display = 'none';"
           ></div>
         </div>
-        <!-- +++++++++++ SCALING ON OFF ++++++ -->
-        <div id="scale-on-off">
-          <div
-            id="scale-off-icon"
-            onclick="document.getElementById('scale-off-icon').style.display = 'none';
-          document.getElementById('scale-on-icon').style.display = 'block';"
-          ></div>
-          <div
-            id="scale-on-icon"
-            onclick="document.getElementById('scale-off-icon').style.display = 'block';
-          document.getElementById('scale-on-icon').style.display = 'none';"
-          ></div>
-        </div>
         <!-- +++++++++++ ZOOMING ON OFF ++++++ -->
         <div id="zoom-on-off">
           <div
@@ -153,6 +163,16 @@
             onclick="document.getElementById('zoom-off-icon').style.display = 'block';
           document.getElementById('zoom-on-icon').style.display = 'none';"
           ></div>
+          <div id="zoom-slider-div">
+            <input
+              id="zoom-slider"
+              type="range"
+              min="1"
+              max="8"
+              value="1"
+              step="1"
+            />
+          </div>
         </div>
       </div>
       <!-- ================================================================================= -->

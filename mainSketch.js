@@ -15,9 +15,6 @@ window.onload = function () {
 let customCanvas;
 //It stores the highest magnitude of the vector
 let highestMagnitudeVector;
-//Flag to control the zoom enabling (1) and disabling (0)
-//by default zoom is disabled
-
 //In order to adjust plots and clicks properly on the screen, we need to change the two following variables simultaneously in proper ratio
 //increasing this value to 2 from 1 will change the ploting range from 15 to 7.5 or half of 15
 //The same will also change 1 unit from 20px to 10px and print vector field till -7.5 to 7.5 instead of -15 to 15
@@ -30,27 +27,9 @@ let divByij = 1;
 //This will affect the mouse click position value and plotted arrow positions as well
 //if we change this value then pixel count per unit length will change but values will be plotted all the way from -15 to 15 and we cannot limit that
 let mulByPx = 1;
-//Creating variables for smooth slider graphics and it's min-max-step value configuration
-//This will be used in Scaling the vectors
-let sliderGraphics,
-  sliderValue = 1,
-  sliderValueMin = 0.5,
-  sliderValueMax = 2,
-  step = 0.02;
-//Creating variables for step slider graphics and it's min-max-step value configuration
-//This will be used in zoom in and out of the vector field
-let checkboxZoom,
-  sliderGraphicsZoom,
-  sliderValueZoomCurrent = 1,
-  sliderValueZoom = 1,
-  sliderValueMinZoom = 1,
-  sliderValueMaxZoom = 8,
-  stepZoom = 1;
 //pDenoString and qDenoString will hold the inputX and inputY expression's denominators as strigs
 //pDenoVal and qDenoVal will hold the evaluted values of pDenoString and qDenoString expressions at specific points (x, y) or (i, j)
 let pDenoString, qDenoString, pDenoVal, qDenoval;
-//This is a flag
-let exprFlag = 1;
 //xInput will get the P(x, y) or i-cap part of the vector function from user
 //xInputString will get string form of the latex input of the mathfield element
 let xInput, xInputString;
@@ -65,7 +44,6 @@ let coordDisplay, coordDisplayDiv;
 let xCoord, yCoord;
 //custom coordinate div holds the custom user input fields of x-coordinate and y-coordinate
 let customCoordDiv;
-
 //This element will hold the instance of pxy DOM element which holds the value of P(x,y) at a specific point
 let pOfXy;
 //This element will hold the instance of qxy DOM element which holds the value of Q(x,y) at a specific point
@@ -77,19 +55,14 @@ let curlEqu, curlValue;
 //This will hold the divergence equation and value
 let divEqu, divValue;
 //If the custom coordinate checkbox is enabled then this variable will become 1 else 0
-//So by default the value is zero1
-let checkBoxFlag = 0;
 //modal <div>, modal-text <p> and Close button <span>
 let modal, modalBody, span, modalHeader;
-
 //switch-on-off div reference
 let switchOnOff;
 
+// =================================================================
 let xAxisGlobal = 0,
   yAxisGlobal = 0;
-
-let xyMin, xyMax, currentXY;
-// =================================================================
 //custom coordinate enable/disable status check flag
 let displayBoxFlagGlobal = false;
 //record on/off flag
@@ -100,6 +73,8 @@ let userClickDataGlobal;
 let scalingFlagGlobal = false;
 // zooming enable/disable flag
 let zoomFlagGlobal = false;
+// applies the scaling slider input value to mainVectorfieldPlotter
+scalingSliderValueGlobal = 1;
 
 //++++++++++++++++++++++++++++++++++//
 //======= HANDLER FUNCTIONS ========//
@@ -188,6 +163,7 @@ const userClickDataInsertHandler = (
 // =====================================================================
 //defining scaleOn handler
 const scaleOnHandler = () => {
+  document.getElementById("scale-slider-div").style.display = "block";
   sliderGraphics.removeAttribute("disabled");
   xyMax.removeAttribute("disabled");
   xyMin.removeAttribute("disabled");
@@ -196,39 +172,41 @@ const scaleOnHandler = () => {
 // ==================================================================
 //defining scaleOff handler
 const scaleOffHandler = () => {
+  document.getElementById("scale-slider-div").style.display = "none";
   sliderGraphics.attribute("disabled", "");
   xyMax.attribute("disabled", "");
   xyMin.attribute("disabled", "");
   scalingFlagGlobal = false;
-  submitButtonPressed();
+  runTheCode();
 };
 // =====================================================================
 //defining zoomOn handler
 const zoomOnHandler = () => {
-  sliderGraphicsZoom.removeAttribute("disabled");
+  document.getElementById("zoom-slider-div").style.display = "block";
   zoomFlagGlobal = true;
 };
 //defining zoomOff handler
 const zoomOffHandler = () => {
-  sliderGraphicsZoom.attribute("disabled", "");
+  document.getElementById("zoom-slider-div").style.display = "none";
   divByij = 1;
   mulByPx = 1;
-  sliderValueZoom = 1;
-  sliderGraphicsZoom.remove();
-  sliderGraphicsZoom = createSlider(
-    sliderValueMinZoom,
-    sliderValueMaxZoom,
-    sliderValueZoom,
-    stepZoom
-  );
-  sliderGraphicsZoom.position(customCanvas.x + 1025, sliderGraphics.y + 110);
-  sliderGraphicsZoom.style("width", "220px");
-  sliderGraphicsZoom.attribute("disabled", "");
-  sliderGraphicsZoom.input(sliderValueZoomRead);
-  submitButtonPressed();
+  document.getElementById("zoom-slider").value = 1;
+  runTheCode();
   zoomFlagGlobal = false;
 };
 // =============================================================
+//defining zoom slider value submit handler
+const zoomSliderSubmitHandler = () => {
+  const zoomSlider = document.getElementById("zoom-slider");
+  divByij = zoomSlider.value;
+  mulByPx = zoomSlider.value;
+};
+// ===============================================================
+//defining scaling slider value submit handler
+const scalingSliderSubmitHandler = () => {
+  const scaleSlider = document.getElementById("scale-slider");
+  scalingSliderValueGlobal = scaleSlider.value;
+};
 
 //++++++++++++++++++++++++++++++++++//
 //==== DOM ELEMENT REFERENCES ======//
@@ -337,40 +315,29 @@ function setup() {
 
   //Getting the instance of the submit button from DOM
   submitBtn = document.getElementById("submit-btn");
-
   //attaching event listener and a function to the main submit button instance
   submitBtn.addEventListener("click", submitButtonPressed);
-
   //converting xInput and yInput value, which is in a latex form, to a string form using nerdamer
   xInputString = nerdamer.convertFromLaTeX(xInput.value).text();
   yInputString = nerdamer.convertFromLaTeX(yInput.value).text();
-
   //This function renders the box and it's axis and labelling for the actual vector field
   outerRectangle();
   axisLines();
   axisLabeling();
-
   //Calling the function to calculate highest magnitude and assigning it to the proper variable
   // console.time("highestMagnitudeOfVector");
   highestMagnitudeVector = highestMagnitudeOfVector();
   // console.timeEnd("highestMagnitudeOfVector");
-
   //This function is rsponsible to calculate and render the vector field arrows
   // console.time("mainVectorFieldPlotter");
   mainVectorFieldPlotter();
   // console.timeEnd("mainVectorFieldPlotter");
-
   //This function is rsponsible to calculate and render the colour bar, indicating the magnitudes
   colourBarAndMagnitude(highestMagnitudeVector);
-
   //This function calculates the curl
   curl();
-
   //This function calculates the divergence
   divergence();
-
-  //This function renders interactive UI elements
-  UIEquation();
 
   // Get the modal
   modal = document.getElementById("myModal");
@@ -624,7 +591,6 @@ function mainVectorFieldPlotter() {
 
   for (i = -ijValLow; i <= ijValHigh + 0.001; i += 1 / divByij) {
     for (j = -ijValLow; j <= ijValHigh + 0.001; j += 1 / divByij) {
-
       isValidPoint = true;
 
       //Here, (x1,y1) = (x,y) of the coordinate point
@@ -648,25 +614,21 @@ function mainVectorFieldPlotter() {
         // console.log("Division by 0 is not allowed - mainVectorFieldPlotter");
         continue;
       }
-  
-      if (sqrtOfXInP != null && (x1 < 0)) {
-        isValidPoint = false;
 
-      } else if (sqrtOfXInQ != null && (x1 < 0)) {
+      if (sqrtOfXInP != null && x1 < 0) {
         isValidPoint = false;
-
-      } else if (sqrtOfYInP != null && (y1 < 0)) {
+      } else if (sqrtOfXInQ != null && x1 < 0) {
         isValidPoint = false;
-
-      } else if (sqrtOfYInQ != null && (y1 < 0)) {
+      } else if (sqrtOfYInP != null && y1 < 0) {
         isValidPoint = false;
-
+      } else if (sqrtOfYInQ != null && y1 < 0) {
+        isValidPoint = false;
       }
-    
+
       if (!isValidPoint) {
-        continue;        
+        continue;
       }
-      
+
       //calculating the magnitude
       magnitude = (xVal ** 2 + yVal ** 2) ** 0.5;
 
@@ -695,8 +657,8 @@ function mainVectorFieldPlotter() {
         }
 
         if (scalingFlagGlobal === true) {
-          x2_10 = x1_20 + xVal * sliderValue;
-          y2_10 = y1_20 + yVal * sliderValue;
+          x2_10 = x1_20 + xVal * scalingSliderValueGlobal;
+          y2_10 = y1_20 + yVal * scalingSliderValueGlobal;
         }
 
         a = (y2 - y1) / (x2 - x1);
@@ -767,58 +729,6 @@ function colourBarAndMagnitude(maxValue) {
   }
 }
 
-function UIEquation() {
-  if (checkBoxFlag == 0) {
-    sliderGraphics = createSlider(
-      sliderValueMin,
-      sliderValueMax,
-      sliderValue,
-      step
-    );
-
-    sliderGraphics.position(customCanvas.x + 1025, customCanvas.y + 420);
-    sliderGraphics.style("width", "220px");
-    sliderGraphics.attribute("disabled", "");
-    sliderGraphics.input(getSliderValue);
-
-    xyMin = createInput(sliderValueMin);
-    xyMin.position(customCanvas.x + 1030, sliderGraphics.y + 30);
-    xyMin.size(50, 20);
-    xyMin.attribute("disabled", "");
-    xyMin.input(xyMinVal);
-
-    xyMax = createInput(sliderValueMax);
-    xyMax.position(customCanvas.x + 1240, sliderGraphics.y + 30);
-    xyMax.size(50, 20);
-    xyMax.attribute("disabled", "");
-    xyMax.input(xyMaxVal);
-
-    currentXY = createInput(sliderValue);
-    currentXY.position(customCanvas.x + 1140, sliderGraphics.y + 30);
-    currentXY.size(50, 20);
-    currentXY.attribute("disabled", "");
-
-    sliderGraphicsZoom = createSlider(
-      sliderValueMinZoom,
-      sliderValueMaxZoom,
-      sliderValueZoom,
-      stepZoom
-    );
-    sliderGraphicsZoom.position(customCanvas.x + 1025, sliderGraphics.y + 110);
-    sliderGraphicsZoom.style("width", "220px");
-    sliderGraphicsZoom.attribute("disabled", "");
-    sliderGraphicsZoom.input(sliderValueZoomRead);
-
-    checkBoxFlag = 1;
-  }
-}
-
-function sliderValueZoomRead() {
-  sliderValueZoomCurrent = sliderGraphicsZoom.value();
-  divByij = sliderValueZoomCurrent;
-  mulByPx = sliderValueZoomCurrent;
-}
-
 function runTheCode() {
   colorMode(RGB);
   clear();
@@ -829,13 +739,20 @@ function runTheCode() {
   highestMagnitudeVector = highestMagnitudeOfVector();
   mainVectorFieldPlotter();
   colourBarAndMagnitude(highestMagnitudeVector);
-  UIEquation();
 }
 
 //This function will be called when we will press the submit buton
 function submitButtonPressed() {
   let iCap, jCap;
   let errorString = "";
+
+  if (zoomFlagGlobal) {
+    zoomSliderSubmitHandler();
+  }
+
+  if (scalingFlagGlobal) {
+    scalingSliderSubmitHandler();
+  }
 
   //converting xInput and yInput value from latex to nerdamer string
   try {
@@ -1323,75 +1240,7 @@ function enableCustomCoordinate() {
   }
 }
 
-function sliderScaleDisplay() {
-  sliderGraphics.remove();
 
-  sliderGraphics = createSlider(
-    sliderValueMin,
-    sliderValueMax,
-    sliderValue,
-    step
-  );
-  sliderGraphics.position(customCanvas.x + 1025, customCanvas.y + 420);
-  sliderGraphics.style("width", "200px");
-}
 
-function getSliderValue() {
-  currentXY.remove();
-  sliderValue = sliderGraphics.value();
 
-  currentXY = createInput(sliderValue);
-  currentXY.position(customCanvas.x + 1140, sliderGraphics.y + 30);
-  currentXY.size(50, 20);
-  currentXY.attribute("disabled", "");
-}
 
-function xyMinVal() {
-  sliderValueMin = xyMin.value();
-
-  sliderGraphics.remove();
-
-  sliderGraphics = createSlider(
-    sliderValueMin,
-    sliderValueMax,
-    sliderValue,
-    step
-  );
-  sliderGraphics.position(customCanvas.x + 1025, customCanvas.y + 420);
-  sliderGraphics.style("width", "220px");
-
-  sliderGraphics.input(getSliderValue);
-
-  currentXY.remove();
-  sliderValue = sliderGraphics.value();
-
-  currentXY = createInput(sliderValue);
-  currentXY.position(customCanvas.x + 1140, sliderGraphics.y + 30);
-  currentXY.size(50, 20);
-  currentXY.attribute("disabled", "");
-}
-
-function xyMaxVal() {
-  sliderValueMax = xyMax.value();
-
-  sliderGraphics.remove();
-
-  sliderGraphics = createSlider(
-    sliderValueMin,
-    sliderValueMax,
-    sliderValue,
-    step
-  );
-  sliderGraphics.position(customCanvas.x + 1025, customCanvas.y + 420);
-  sliderGraphics.style("width", "220px");
-
-  sliderGraphics.input(getSliderValue);
-
-  currentXY.remove();
-  sliderValue = sliderGraphics.value();
-
-  currentXY = createInput(sliderValue);
-  currentXY.position(customCanvas.x + 1140, sliderGraphics.y + 30);
-  currentXY.size(50, 20);
-  currentXY.attribute("disabled", "");
-}
