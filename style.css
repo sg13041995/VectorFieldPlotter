@@ -151,6 +151,7 @@ body {
 
 #custom-coordinate-div {
   position: relative;
+  display: none;
 }
 
 #custom-coordinate {
@@ -300,9 +301,9 @@ body {
 /* ++++++++++++++++++++++++++++++++++++++++++++++ */
 
 #control-menu-bar {
-  display: flex;
   height: fit-content;
   margin: 10px;
+  padding: 9px 0px 9px 0px;
 
   background-image: linear-gradient(to top, #d8d9db 0%, #fff 80%, #fdfdfd 100%);
   border-radius: 30px;
@@ -310,6 +311,10 @@ body {
   /* convex effect */
   box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
     0 -6px 4px #fefefe, inset 0 0 3px 0 #cecfd1;
+}
+
+#control-menu-bar-child {
+  display: flex;
 }
 
 /* ++++++++++++++ RECORD ON OFF ++++++++++++++ */
@@ -402,7 +407,7 @@ body {
   width: fit-content;
   padding: 0.5rem;
   
-  left: -74px;
+  left: -64px;
   top: -59px;
 }
 
@@ -455,4 +460,11 @@ body {
 
 #zoom-slider {
   width: 10rem;
+}
+
+/* ========================================================= */
+
+.disable-div{
+  pointer-events: none;
+  opacity: 0.5;
 }
