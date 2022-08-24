@@ -45,128 +45,6 @@ let scalingFlagGlobal = false;
 let zoomFlagGlobal = false;
 // applies the scaling slider input value to mainVectorfieldPlotter
 let scalingSliderValueGlobal = 1;
-//defining custom keyboard layer
-const CUSTOM_KEYBOARD_LAYER = {
-  "custom-keyboard-layer": {
-    styles: "",
-    rows: [
-      [
-        // { latex: "a" },
-        { latex: "x" },
-        { class: "separator w5" },
-        { label: "7", key: "7" },
-        // Will display the label using the system font. To display
-        // with the TeX font, use:
-        // { class: "tex", label: "7", key: "7" },
-        // or
-        // { latex: "7"},
-        { label: "8", key: "8" },
-        { label: "9", key: "9" },
-        {
-          class: "tex small",
-          label: "/",
-          insert: "\\frac{#@}{#0}",
-        },
-        { class: "separator w5" },
-        {
-          class: "tex small",
-          label: "<span><i>n</i><sup>&thinsp;<i>2</i></sup></span>",
-          insert: "$$#@^{2}$$",
-        },
-        {
-          class: "tex small",
-          label: "<span><i>n</i><sup>&thinsp;<i>3</i></sup></span>",
-          insert: "$$#@^{3}$$",
-        },
-        {
-          class: "small",
-          latex: "\\sqrt{#0}",
-          insert: "$$\\sqrt{#0}$$",
-        },
-      ],
-      [
-        // { class: "tex", latex: "b" },
-        { class: "separator w5" },
-        { class: "separator w5" },
-        { class: "separator w5" },
-        { class: "separator w5" },
-        { class: "tex", latex: "y" },
-        { class: "separator w5" },
-        { label: "4", latex: "4" },
-        { label: "5", key: "5" },
-        { label: "6", key: "6" },
-        { latex: "\\times" },
-        { class: "separator w5" },
-        {
-          class: "tex small",
-          label: "<span><i>x</i>&thinsp;²</span>",
-          insert: "$$(x^{2})$$",
-        },
-        {
-          class: "tex small",
-          label: "<span><i>y</i>&thinsp;²</span>",
-          insert: "$$(y^{2})$$",
-        },
-        { class: "small", latex: "\\frac{#0}{#0}" },
-        { class: "separator" },
-        { class: "separator" },
-      ],
-      [
-        // { class: "tex", label: "<i>c</i>" },
-        // { class: "tex", label: "<i>z</i>" },
-        { class: "separator w5" },
-        { class: "separator w5" },
-        { class: "separator w5" },
-        { label: "1", key: "1" },
-        { label: "2", key: "2" },
-        { label: "3", key: "3" },
-        { latex: "-" },
-        { class: "separator w5" },
-        { class: "separator" },
-        { latex: "(" },
-        { latex: ")" },
-      ],
-      [
-        { class: "separator w5" },
-        { class: "separator w5" },
-        { class: "separator w5" },
-        { class: "separator w5" },
-        { label: "0", key: "0" },
-        { latex: "." },
-        // { latex: "\\pi" },
-        { latex: "+" },
-        { class: "separator w5" },
-        { class: "separator w5" },
-
-        {
-          class: "action",
-          label: "<svg><use xlink:href='#svg-arrow-left' /></svg>",
-          command: ["performWithFeedback", "moveToPreviousChar"],
-        },
-        {
-          class: "action",
-          label: "<svg><use xlink:href='#svg-arrow-right' /></svg>",
-          command: ["performWithFeedback", "moveToNextChar"],
-        },
-        {
-          class: "action font-glyph bottom right",
-          label: "&#x232b;",
-          command: ["performWithFeedback", "deleteBackward"],
-        },
-      ],
-    ],
-  },
-};
-//defining a keyboard
-const HIGH_SCHOOL_KEYBOARD = {
-  "custom-keyboard": {
-    // Label displayed in the Virtual Keyboard Switcher
-    label: "Keyboard",
-    // Tooltip when hovering over the label
-    tooltip: "Keyboard",
-    layer: "custom-keyboard-layer",
-  },
-};
 // ==================================================================================
 
 //++++++++++++++++++++++++++++++++++//
@@ -264,7 +142,7 @@ const scaleOnHandler = () => {
 const scaleOffHandler = () => {
   document.getElementById("scale-slider-div").style.display = "none";
   scalingFlagGlobal = false;
-  runTheCode();
+  canvasRerenderHandler();
 };
 // =====================================================================
 //defining zoomOn handler
@@ -278,7 +156,7 @@ const zoomOffHandler = () => {
   divByijGlobal = 1;
   mulByPxGlobal = 1;
   document.getElementById("zoom-slider").value = 1;
-  runTheCode();
+  canvasRerenderHandler();
   zoomFlagGlobal = false;
 };
 // =============================================================
@@ -427,142 +305,9 @@ const chekcExpressionValidityHandler = () => {
     return;
   }
 };
-
-//++++++++++++++++++++++++++++++++++//
-//==== DOM ELEMENT REFERENCES ======//
-//++++++++++++++++++++++++++++++++++//
-//getting main control menu bar
-const controlMenuBarChild = document.getElementById("control-menu-bar-child");
-// ================================================================
-const recordOff = document.getElementById("record-off-icon");
-//adding click event listener
-recordOff.addEventListener("click", recordOnHandler);
-//==============================================================
-const recordOn = document.getElementById("record-on-icon");
-//adding click event listener
-recordOn.addEventListener("click", recordOffHandler);
-// ===============================================================
-const scaleOn = document.getElementById("scale-on-icon");
-//adding click event listener
-scaleOn.addEventListener("click", scaleOffHandler);
-// =================================================================
-const scaleOff = document.getElementById("scale-off-icon");
-//adding click event listener
-scaleOff.addEventListener("click", scaleOnHandler);
-// ===================================================================
-const zoomOn = document.getElementById("zoom-on-icon");
-//adding click event listener
-zoomOn.addEventListener("click", zoomOffHandler);
-// =================================================================
-const zoomOff = document.getElementById("zoom-off-icon");
-//adding click event listener
-zoomOff.addEventListener("click", zoomOnHandler);
-// ===================================================================
-//custom coordinate enable switch
-const switchOnOff = document.getElementById("switch-on-off");
-switchOnOff.addEventListener("click", customCoordinateHandler);
-// ===================================================================
-//display user selected coordinate value
-const coordDisplay = document.getElementById("coordinate-disp");
-//parent of the coordinate display math-field element
-const coordDisplayDiv = document.getElementById("coordinate-disp-div");
-// =======================================================================
-//custom coordinate div
-const customCoordDiv = document.getElementById("custom-coordinate-div");
-//child of custom coordinate div
-//display the x and y coordinate value
-const xCoord = document.getElementById("x-coordinate");
-const yCoord = document.getElementById("y-coordinate");
-// =========================================================================
-//display flow field properties (expression and values)
-//P(x,y) and Q(x,y) value
-const pOfXy = document.getElementById("p-of-xy");
-const qOfXy = document.getElementById("q-of-xy");
-//magnitude
-const magnitudeVal = document.getElementById("magnitude");
-//curl equation
-const curlEqu = document.getElementById("curl-equation");
-//curl value
-const curlValue = document.getElementById("curl-value");
-//divergence equation
-const divEqu = document.getElementById("divergence-equation");
-//divergence value
-const divValue = document.getElementById("divergence-value");
-// =======================================================================
-//getting the modal parent div
-const modal = document.getElementById("myModal");
-//modal body message
-const modalBody = document.getElementById("modal-text");
-//modal header
-const modalHeader = document.getElementById("modal-header");
-//close button of the modal
-const span = document.getElementsByClassName("close")[0];
-span.onclick = function () {
-  modal.style.display = "none";
-};
-// When the user clicks anywhere outside of the modal (on the backdrop), close it
-window.onclick = function (event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-};
-// ==========================================================================
-//P(x,y) and Q(x,y) equation submit button
-const submitBtn = document.getElementById("submit-btn");
-submitBtn.addEventListener("click", submitButtonPressed);
-// ===========================================================================
-// getting the P(x,y) and Q(x,y) expression input elements
-const xInputGlobal = document.getElementById("x-input");
-const yInputGlobal = document.getElementById("y-input");
-// ===========================================================================
-
-//++++++++++++++++++++++++++++++++++//
-//======== SETUP FUNCTION ==========//
-//++++++++++++++++++++++++++++++++++//
-function setup() {
-  //Creating the canvas
-  const customCanvas = createCanvas(1300, 700);
-  customCanvas.style("z-index: -100");
-  customCanvas.position(0, 370);
-
-  //translating the (0,0) to the centre of the canvas
-  translate(width / 2, height / 2);
-
-  //getting the element references and configuring them to have the virtual keyboard
-  xInputGlobal.setOptions({
-    customVirtualKeyboardLayers: CUSTOM_KEYBOARD_LAYER,
-    customVirtualKeyboards: HIGH_SCHOOL_KEYBOARD,
-    virtualKeyboards: "custom-keyboard",
-    virtualKeyboardMode: "manual",
-    // virtualKeyboards: "numeric",
-  });
-  yInputGlobal.setOptions({
-    customVirtualKeyboardLayers: CUSTOM_KEYBOARD_LAYER,
-    customVirtualKeyboards: HIGH_SCHOOL_KEYBOARD,
-    virtualKeyboards: "custom-keyboard",
-    virtualKeyboardMode: "manual",
-    // virtualKeyboards: "numeric",
-  });
-
-  //converting xInputGlobal and yInputGlobal latex values to nerdamer string
-  xInputStringGlobal = nerdamer.convertFromLaTeX(xInputGlobal.value).text();
-  yInputStringGlobal = nerdamer.convertFromLaTeX(yInputGlobal.value).text();
-
-  //renders the flow field square, it's axis lines and labelling
-  outerRectangle();
-  axisLines();
-  axisLabeling();
-
-  //calculating and highest magnitude
-  highestMagnitudeVectorGlobal = calculateHighestMagnitudeOfVector();
-  //plotting the individual vectors of the vector field
-  mainVectorFieldPlotter();
-  //rendering the coloured magnitude bar
-  colourBarAndMagnitude(highestMagnitudeVectorGlobal);
-}
-
-//Function to define the outer rectangle of the plot
-function outerRectangle() {
+// ========================================================================
+//renders the outer rectangle of the vector plot
+const renderOuterRectangle = () => {
   //Setting colour mode to RGB (Hue, Saturation, Brightness)
   colorMode(RGB);
 
@@ -577,9 +322,9 @@ function outerRectangle() {
   //x1 = -320, y1 = -320, width = 640, height = 640;
   rect(-320, -320, 640, 640);
 }
-
-//Function to define the axis lines inside the rectangle of the plot
-function axisLines() {
+// ============================================================================
+//render axis lines inside the rectangle of the plot
+const renderAxisLines = () => {
   //major axis lines
   //HSB(360,100,100) maximum values
   colorMode(RGB);
@@ -605,10 +350,9 @@ function axisLines() {
     line(0 + i, -320, 0 + i, 320);
   }
 }
-
-//Function to define the axis labelling outside the rectangle of the plot
-//This also handles the change in axis labelling based on zoom enable and zoom factor
-function axisLabeling() {
+// ============================================================================
+// render axis labeling with calculated zoom
+const axisLabelingHandler = () => {
   //HSB(360,100,100) maximum values
   colorMode(HSB);
 
@@ -701,10 +445,10 @@ function axisLabeling() {
   //We are chaning the fill(0) to noFill()
   noFill();
 }
-
-//Function to calculate the highest magnitude of the vector among all to colour code the magnitude
+// =================================================================================
+//Function to calculate the highest magnitude of the vector
 //return value of this function is fed to the function, responsible to display the colour bar
-function calculateHighestMagnitudeOfVector() {
+const calculateHighestMagnitudeOfVector = () => {
   let i = 0,
     j = 0,
     //count will be used as index number for setOfMagnitude array
@@ -767,35 +511,52 @@ function calculateHighestMagnitudeOfVector() {
   //returning the highest magnitude which was the main purpose of this function
   return highestMagnitude;
 }
-
+// ======================================================================================
 //This function is responsible for the calculation and rendering of the actual vector field arrows with colour coding
-function mainVectorFieldPlotter() {
+const mainVectorFieldPlotter = () => {
   let x1, y1, x2, y2, xVal, yVal;
   let x1_20, y1_20, x2_10, y2_10;
   let magnitude = 0;
-  let ijValLow, ijValHigh;
+  let ijValLow, ijValHigh, inverseDivByijGlobal;
   let i, j;
   let xUnit, yUnit, xUnit_12, yUnit_12;
   let a, b, c, theta;
 
-  ijValLow = 15 / divByijGlobal;
-  ijValHigh = 15 / divByijGlobal;
+  ijValLow = (15/divByijGlobal);
+  ijValHigh = (15/divByijGlobal);
+  inverseDivByijGlobal = (1/divByijGlobal);
 
-  let sqrtOfXInP = xInputStringGlobal.match(/sqrt\(x\)/g) || xInputStringGlobal.match(/x\^0.5/g);
-  let sqrtOfXInQ = yInputStringGlobal.match(/sqrt\(x\)/g) || yInputStringGlobal.match(/x\^0.5/g);
-  let sqrtOfYInP = xInputStringGlobal.match(/sqrt\(y\)/g) || xInputStringGlobal.match(/y\^0.5/g);
-  let sqrtOfYInQ = yInputStringGlobal.match(/sqrt\(y\)/g) || yInputStringGlobal.match(/y\^0.5/g);;
+  let sqrtOfXInP =
+    xInputStringGlobal.match(/sqrt\(x\)/g) ||
+    xInputStringGlobal.match(/x\^0.5/g);
+  let sqrtOfXInQ =
+    yInputStringGlobal.match(/sqrt\(x\)/g) ||
+    yInputStringGlobal.match(/x\^0.5/g);
+  let sqrtOfYInP =
+    xInputStringGlobal.match(/sqrt\(y\)/g) ||
+    xInputStringGlobal.match(/y\^0.5/g);
+  let sqrtOfYInQ =
+    yInputStringGlobal.match(/sqrt\(y\)/g) ||
+    yInputStringGlobal.match(/y\^0.5/g);
 
   let isValidPoint;
 
-  for (i = -ijValLow; i <= ijValHigh + 0.001; i += 1 / divByijGlobal) {
-    for (j = -ijValLow; j <= ijValHigh + 0.001; j += 1 / divByijGlobal) {
+  for (i = -ijValLow; i <= ijValHigh + 0.001; i += inverseDivByijGlobal) {
+    for (j = -ijValLow; j <= ijValHigh + 0.001; j += inverseDivByijGlobal) {
       isValidPoint = true;
+
+      if ((i < -3e-18 && i > -3e-5) || (i > 3e-18 && i < 3e-5)) {
+        i = 0;
+      }
+
+      if ((j < -3e-18 && j > -3e-5) || (j > 3e-18 && j < 3e-5)) {
+        j = 0;
+      }
 
       //Here, (x1,y1) = (x,y) of the coordinate point
       //x1=x, y1=y axis value of the selected coordinate point
-      x1 = i;
-      y1 = j;
+      x1 = Number(i.toFixed(4));
+      y1 = Number(j.toFixed(4));
 
       //Multiplying x1 and y1 with 20 or scaling up the (x1,y1) by 20x
       x1_20 = i * (20 * mulByPxGlobal);
@@ -907,9 +668,9 @@ function mainVectorFieldPlotter() {
     }
   }
 }
-
-//this function will plot the coulour bar with magnitude label
-function colourBarAndMagnitude(maxValue) {
+// =============================================================================
+//render colour bar with magnitude label
+const magnitudeColourBarHandler = (maxValue) => {
   const noOfDivision = 341;
   const unitSize = maxValue / noOfDivision;
   let i, j, l;
@@ -931,53 +692,9 @@ function colourBarAndMagnitude(maxValue) {
     noStroke();
   }
 }
-
-function runTheCode() {
-  chekcExpressionValidityHandler();
-
-  if (isValidExpressionGlobal) {
-    colorMode(RGB);
-    clear();
-    colorMode(HSB);
-    outerRectangle();
-    axisLines();
-    axisLabeling();
-    highestMagnitudeVectorGlobal = calculateHighestMagnitudeOfVector();
-    mainVectorFieldPlotter();
-    colourBarAndMagnitude(highestMagnitudeVectorGlobal);
-    controlMenuBarChild.classList.remove("disable-div");
-  } else {
-    modalBody.innerText = `Invalid Input Expression...\n\nOR\n\nUnknown Input Variable...`;
-    modalHeader.innerHTML = "Error!";
-    modal.style.display = "block";
-    controlMenuBarChild.classList.add("disable-div");
-  }
-}
-
-//This function will be called when we will press the submit buton
-function submitButtonPressed() {
-  chekcExpressionValidityHandler();
-  if (isValidExpressionGlobal) {
-    if (zoomFlagGlobal) {
-      zoomSliderSubmitHandler();
-    }
-    if (scalingFlagGlobal) {
-      scalingSliderSubmitHandler();
-    }
-    runTheCode();
-    window.scrollTo(0, 360);
-    controlMenuBarChild.classList.remove("disable-div");
-    return;
-  } else {
-    controlMenuBarChild.classList.add("disable-div");
-    modalBody.innerText = `Invalid Input Expression...\n\nOR\n\nUnknown Input Variable...`;
-    modalHeader.innerHTML = "Error!";
-    return (modal.style.display = "block");
-  }
-}
-
+// ================================================================
 // Check and return whether we have clicked inside or outside of the plotting area
-function isMouseClickedInside() {
+const isMouseClickedInside = () => {
   let isClickedInside = false;
 
   if (isValidExpressionGlobal) {
@@ -1008,6 +725,566 @@ function isMouseClickedInside() {
     return [0, 0, isClickedInside];
   }
 }
+// ==================================================================================
+//rerender the canvas
+const canvasRerenderHandler = () => {
+  chekcExpressionValidityHandler();
+
+  if (isValidExpressionGlobal) {
+    colorMode(RGB);
+    clear();
+    colorMode(HSB);
+    renderOuterRectangle();
+    renderAxisLines();
+    axisLabelingHandler();
+    highestMagnitudeVectorGlobal = calculateHighestMagnitudeOfVector();
+    mainVectorFieldPlotter();
+    magnitudeColourBarHandler(highestMagnitudeVectorGlobal);
+    controlMenuBarChild.classList.remove("disable-div");
+  } else {
+    modalBody.innerText = `Invalid Input Expression...\n\nOR\n\nUnknown Input Variable...`;
+    modalHeader.innerHTML = "Error!";
+    modal.style.display = "block";
+    controlMenuBarChild.classList.add("disable-div");
+  }
+}
+// ==========================================================================================
+//This function will be called when we will press the submit buton
+const submitButtonHandler = () => {
+  chekcExpressionValidityHandler();
+  if (isValidExpressionGlobal) {
+    if (zoomFlagGlobal) {
+      zoomSliderSubmitHandler();
+    }
+    if (scalingFlagGlobal) {
+      scalingSliderSubmitHandler();
+    }
+    canvasRerenderHandler();
+    window.scrollTo(0, 360);
+    controlMenuBarChild.classList.remove("disable-div");
+    return;
+  } else {
+    controlMenuBarChild.classList.add("disable-div");
+    modalBody.innerText = `Invalid Input Expression...\n\nOR\n\nUnknown Input Variable...`;
+    modalHeader.innerHTML = "Error!";
+    return (modal.style.display = "block");
+  }
+}
+// ================================================================================
+//calculates and return divergence equation and value
+const divergence = (xAxis, yAxis) => {
+  let divergenceVal;
+  let pDx, qDy;
+
+  //replacing sqrt(y) in xInputStringGlobal with P before derivative
+  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
+  let checkResultP =
+    xInputStringGlobal.match(/sqrt\(y\)/g) ||
+    xInputStringGlobal.match(/y\^0.5/g);
+  if (checkResultP != null) {
+    let replacedXInputString =
+      xInputStringGlobal.replace(/sqrt\(y\)/g, "P") ||
+      xInputStringGlobal.replace(/y\^0.5/g, "P");
+    //doing derivative
+    pDx = nerdamer.diff(replacedXInputString, "x");
+    //replacing P in pDy with sqrt(x) after derivative
+    pDx = pDx.text().replace(/P/g, "sqrt(y)");
+  } else {
+    pDx = nerdamer.diff(xInputStringGlobal, "x");
+  }
+
+  //replacing sqrt(x) in yInputStringGlobal with Q before derivative
+  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
+  let checkResultQ = yInputStringGlobal.match(/sqrt\(x\)/g);
+  if (checkResultQ != null) {
+    let replacedYInputString =
+      yInputStringGlobal.replace(/sqrt\(x\)/g, "Q") ||
+      yInputStringGlobal.replace(/x\^0.5/g, "Q");
+    //doing derivative
+    qDy = nerdamer.diff(replacedYInputString, "y");
+    //replacing Q in qDy with sqrt(x) after derivative
+    qDy = qDy.text().replace(/Q/g, "sqrt(x)");
+  } else {
+    qDy = nerdamer.diff(yInputStringGlobal, "y");
+  }
+
+  //divergence equation
+  let divergenceEq = nerdamer(pDx).add(qDy);
+
+  //divergence value
+  try {
+    if (displayBoxFlagGlobal === true) {
+      divergenceVal = Number(
+        Number(
+          nerdamer(divergenceEq, {
+            x: xCoord.value,
+            y: yCoord.value,
+          }).evaluate()
+        ).toFixed(6)
+      );
+    } else if (displayBoxFlagGlobal === false) {
+      divergenceVal = Number(
+        Number(
+          nerdamer(divergenceEq, { x: xAxis, y: yAxis }).evaluate()
+        ).toFixed(6)
+      );
+    }
+  } catch (err) {
+    divergenceVal = "UNDEF";
+  }
+
+  return [divergenceEq, divergenceVal];
+}
+// ===========================================================================
+//calculates and return curl equation and value
+const curl = (xAxis, yAxis) => {
+  let pDy, qDx;
+  let curlVal;
+
+  //replacing sqrt(x) in xInputStringGlobal with P before derivative
+  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
+  let checkResultP =
+    xInputStringGlobal.match(/sqrt\(x\)/g) ||
+    xInputStringGlobal.match(/x\^0.5/g);
+  if (checkResultP != null) {
+    let replacedXInputString =
+      xInputStringGlobal.replace(/sqrt\(x\)/g, "P") ||
+      xInputStringGlobal.replace(/x\^0.5/g, "P");
+    //doing derivative
+    pDy = nerdamer.diff(replacedXInputString, "y");
+    //replacing P in pDy with sqrt(x) after derivative
+    pDy = pDy.text().replace(/P/g, "sqrt(x)");
+  } else {
+    pDy = nerdamer.diff(xInputStringGlobal, "y");
+  }
+
+  //replacing sqrt(y) in yInputStringGlobal with Q before derivative
+  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
+  let checkResultQ =
+    yInputStringGlobal.match(/sqrt\(y\)/g) ||
+    yInputStringGlobal.match(/y\^0.5/g);
+  if (checkResultQ != null) {
+    let replacedYInputString =
+      yInputStringGlobal.replace(/sqrt\(y\)/g, "Q") ||
+      yInputStringGlobal.replace(/y\^0.5/g, "Q");
+    //doing derivative
+    qDx = nerdamer.diff(replacedYInputString, "x");
+    //replacing Q in qDx with sqrt(y) after derivative
+    qDx = qDx.text().replace(/Q/g, "sqrt(y)");
+  } else {
+    qDx = nerdamer.diff(yInputStringGlobal, "x");
+  }
+
+  //curl equation
+  let curlEq = nerdamer(qDx).subtract(pDy);
+
+  // curl value
+  try {
+    if (displayBoxFlagGlobal === true) {
+      curlVal = Number(
+        Number(
+          nerdamer(curlEq, {
+            x: xCoord.value,
+            y: yCoord.value,
+          }).evaluate()
+        ).toFixed(6)
+      );
+    } else if (displayBoxFlagGlobal === false) {
+      curlVal = Number(
+        Number(nerdamer(curlEq, { x: xAxis, y: yAxis }).evaluate()).toFixed(6)
+      );
+    }
+  } catch (err) {
+    curlVal = "UNDEF";
+  }
+
+  return [curlEq, curlVal];
+}
+// ============================================================================
+//calculates P(x,y);Q(x,y);Magnitude;
+//calls divergence(); and curl(); and get their values
+const calculateAll = (xAxis, yAxis) => {
+  let x, y, pxy, qxy;
+  let magnitude;
+
+  if (displayBoxFlagGlobal === false) {
+    x = xAxis;
+    y = yAxis;
+  } else if (displayBoxFlagGlobal === true) {
+    x = Number(xCoord.value);
+    y = Number(yCoord.value);
+    if (Number.isNaN(x) || Number.isNaN(y)) {
+      modalBody.innerText = "Invalid Coordinate Input...";
+      modalHeader.innerHTML = "Error!";
+      modal.style.display = "block";
+      return false;
+    }
+  }
+
+  //calculating P(x,y) and Q(x,y)
+  try {
+    pxy = Number(nerdamer(xInputStringGlobal, { x: x, y: y }).evaluate());
+  } catch (err) {
+    pxy = "UNDEF";
+    magnitude = "UNDEF";
+  }
+  try {
+    qxy = Number(nerdamer(yInputStringGlobal, { x: x, y: y }).evaluate());
+  } catch (err) {
+    qxy = "UNDEF";
+    magnitude = "UNDEF";
+  }
+
+  //calculating magnitude
+  if (magnitude != "UNDEF") {
+    magnitude = Number(((pxy ** 2 + qxy ** 2) ** 0.5).toFixed(6));
+  }
+
+  let sqrtOfXInP =
+    xInputStringGlobal.match(/sqrt\(x\)/g) ||
+    xInputStringGlobal.match(/x\^0.5/g);
+  let sqrtOfXInQ =
+    yInputStringGlobal.match(/sqrt\(x\)/g) ||
+    yInputStringGlobal.match(/x\^0.5/g);
+  let sqrtOfYInP =
+    xInputStringGlobal.match(/sqrt\(y\)/g) ||
+    xInputStringGlobal.match(/y\^0.5/g);
+  let sqrtOfYInQ =
+    yInputStringGlobal.match(/sqrt\(y\)/g) ||
+    yInputStringGlobal.match(/y\^0.5/g);
+
+  let validityMessage = false;
+
+  if (sqrtOfXInP != null && x < 0) {
+    validityMessage = "P(x,y) is not valid at -x coordinate";
+  } else if (sqrtOfXInQ != null && x < 0) {
+    validityMessage = "Q(x,y) is not valid at -x coordinate";
+  } else if (sqrtOfYInP != null && y < 0) {
+    validityMessage = "P(x,y) is not valid at -y coordinate";
+  } else if (sqrtOfYInQ != null && y < 0) {
+    validityMessage = "Q(x,y) is not valid at -y coordinate";
+  }
+
+  if (validityMessage) {
+    modalBody.innerText = `${validityMessage}`;
+    modalHeader.innerHTML = "ATTENTION!";
+    modal.style.display = "block";
+    return false;
+  }
+
+  //for calculating curl and divergence, we are calling two different functions
+  let [divE, divV] = divergence(xAxis, yAxis);
+  let [curlE, curlV] = curl(xAxis, yAxis);
+
+  return [pxy, qxy, magnitude, curlE, curlV, divE, divV];
+}
+// ===================================================================================
+//display the following data
+//(x,y);P(x,y);Q(x,y);Magnitude;Curl Eq;Curl Val;Divergence Eq;Divergence Val
+const displayAllData = (
+  xAxis,
+  yAxis,
+  dataStatus,
+  pxy = null,
+  qxy = null,
+  magnitude = null,
+  curlE = null,
+  curlV = null,
+  divE = null,
+  divV = null
+) => {
+  //if dataStatus true then only we have calculated values and we wanna show them otherwise don't
+  if (dataStatus === true) {
+    if (displayBoxFlagGlobal === false) {
+      coordDisplay.value = `\\left(x,y\\right)=\\left(${xAxis.toFixed(
+        3
+      )},${yAxis.toFixed(3)}\\right)`;
+    }
+    //if the custom coordinate check box is checked or enabled
+    //we have a flag variable to store the checkbox status
+    if (displayBoxFlagGlobal === true) {
+      coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
+    }
+    //displaying P(x,y) Q(x,y)
+    if (pxy === "UNDEF" || qxy === "UNDEF") {
+      pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy}`;
+      qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy}`;
+    } else {
+      pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy.toFixed(6)}`;
+      qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy.toFixed(6)}`;
+    }
+    //displaying magnitude
+    magnitudeVal.value = `\\sqrt{P^2+Q^2}=${magnitude}`;
+    //displaying the curl equation by assigning it to proper DOM element
+    curlEqu.value = curlE.toTeX();
+    //displaying the div value by assigning it to proper DOM element
+    curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=
+    ${curlV}`;
+    //displaying the div equation by assigning it to proper DOM element
+    divEqu.value = divE.toTeX();
+    //displaying the divergence value by assigning it to proper DOM element
+    divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=
+    {${divV}`;
+  } else {
+    if (displayBoxFlagGlobal === false) {
+      coordDisplay.value = `\\left(x,y\\right)=\\left(${xAxis.toFixed(
+        3
+      )},${yAxis.toFixed(3)}\\right)`;
+    }
+    //if the custom coordinate check box is checked or enabled
+    //we have a flag variable to store the checkbox status
+    if (displayBoxFlagGlobal === true) {
+      coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
+    }
+  }
+}
+// ====================================================================================
+
+//++++++++++++++++++++++++++++++++++//
+//==== DOM ELEMENT REFERENCES ======//
+//++++++++++++++++++++++++++++++++++//
+//getting main control menu bar
+const controlMenuBarChild = document.getElementById("control-menu-bar-child");
+// ================================================================
+const recordOff = document.getElementById("record-off-icon");
+//adding click event listener
+recordOff.addEventListener("click", recordOnHandler);
+//==============================================================
+const recordOn = document.getElementById("record-on-icon");
+//adding click event listener
+recordOn.addEventListener("click", recordOffHandler);
+// ===============================================================
+const scaleOn = document.getElementById("scale-on-icon");
+//adding click event listener
+scaleOn.addEventListener("click", scaleOffHandler);
+// =================================================================
+const scaleOff = document.getElementById("scale-off-icon");
+//adding click event listener
+scaleOff.addEventListener("click", scaleOnHandler);
+// ===================================================================
+const zoomOn = document.getElementById("zoom-on-icon");
+//adding click event listener
+zoomOn.addEventListener("click", zoomOffHandler);
+// =================================================================
+const zoomOff = document.getElementById("zoom-off-icon");
+//adding click event listener
+zoomOff.addEventListener("click", zoomOnHandler);
+// ===================================================================
+//custom coordinate enable switch
+const switchOnOff = document.getElementById("switch-on-off");
+switchOnOff.addEventListener("click", customCoordinateHandler);
+// ===================================================================
+//display user selected coordinate value
+const coordDisplay = document.getElementById("coordinate-disp");
+//parent of the coordinate display math-field element
+const coordDisplayDiv = document.getElementById("coordinate-disp-div");
+// =======================================================================
+//custom coordinate div
+const customCoordDiv = document.getElementById("custom-coordinate-div");
+//child of custom coordinate div
+//display the x and y coordinate value
+const xCoord = document.getElementById("x-coordinate");
+const yCoord = document.getElementById("y-coordinate");
+// =========================================================================
+//display flow field properties (expression and values)
+//P(x,y) and Q(x,y) value
+const pOfXy = document.getElementById("p-of-xy");
+const qOfXy = document.getElementById("q-of-xy");
+//magnitude
+const magnitudeVal = document.getElementById("magnitude");
+//curl equation
+const curlEqu = document.getElementById("curl-equation");
+//curl value
+const curlValue = document.getElementById("curl-value");
+//divergence equation
+const divEqu = document.getElementById("divergence-equation");
+//divergence value
+const divValue = document.getElementById("divergence-value");
+// =======================================================================
+//getting the modal parent div
+const modal = document.getElementById("myModal");
+//modal body message
+const modalBody = document.getElementById("modal-text");
+//modal header
+const modalHeader = document.getElementById("modal-header");
+//close button of the modal
+const span = document.getElementsByClassName("close")[0];
+span.onclick = function () {
+  modal.style.display = "none";
+};
+// When the user clicks anywhere outside of the modal (on the backdrop), close it
+window.onclick = function (event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+};
+// ==========================================================================
+//P(x,y) and Q(x,y) equation submit button
+const submitBtn = document.getElementById("submit-btn");
+submitBtn.addEventListener("click", submitButtonHandler);
+// ===========================================================================
+// getting the P(x,y) and Q(x,y) expression input elements
+const xInputGlobal = document.getElementById("x-input");
+const yInputGlobal = document.getElementById("y-input");
+// ===========================================================================
+
+//++++++++++++++++++++++++++++++++++//
+//======== SETUP FUNCTION ==========//
+//++++++++++++++++++++++++++++++++++//
+function setup() {
+  //Creating the canvas
+  const customCanvas = createCanvas(1300, 700);
+  customCanvas.style("z-index: -100");
+  customCanvas.position(0, 370);
+  //translating the (0,0) to the centre of the canvas
+  translate(width / 2, height / 2);
+  //defining custom keyboard layer
+  const CUSTOM_KEYBOARD_LAYER = {
+    "custom-keyboard-layer": {
+      styles: "",
+      rows: [
+        [
+          { latex: "x" },
+          { class: "separator w5" },
+          { label: "7", key: "7" },
+          { label: "8", key: "8" },
+          { label: "9", key: "9" },
+          {
+            class: "tex small",
+            label: "/",
+            insert: "\\frac{#@}{#0}",
+          },
+          { class: "separator w5" },
+          {
+            class: "tex small",
+            label: "<span><i>n</i><sup>&thinsp;<i>2</i></sup></span>",
+            insert: "$$#@^{2}$$",
+          },
+          {
+            class: "tex small",
+            label: "<span><i>n</i><sup>&thinsp;<i>3</i></sup></span>",
+            insert: "$$#@^{3}$$",
+          },
+          {
+            class: "small",
+            latex: "\\sqrt{#0}",
+            insert: "$$\\sqrt{#0}$$",
+          },
+        ],
+        [
+          { class: "separator w5" },
+          { class: "separator w5" },
+          { class: "separator w5" },
+          { class: "separator w5" },
+          { class: "tex", latex: "y" },
+          { class: "separator w5" },
+          { label: "4", latex: "4" },
+          { label: "5", key: "5" },
+          { label: "6", key: "6" },
+          { latex: "\\times" },
+          { class: "separator w5" },
+          {
+            class: "tex small",
+            label: "<span><i>x</i>&thinsp;²</span>",
+            insert: "$$(x^{2})$$",
+          },
+          {
+            class: "tex small",
+            label: "<span><i>y</i>&thinsp;²</span>",
+            insert: "$$(y^{2})$$",
+          },
+          { class: "small", latex: "\\frac{#0}{#0}" },
+          { class: "separator" },
+          { class: "separator" },
+        ],
+        [
+          { class: "separator w5" },
+          { class: "separator w5" },
+          { class: "separator w5" },
+          { label: "1", key: "1" },
+          { label: "2", key: "2" },
+          { label: "3", key: "3" },
+          { latex: "-" },
+          { class: "separator w5" },
+          { class: "separator" },
+          { latex: "(" },
+          { latex: ")" },
+        ],
+        [
+          { class: "separator w5" },
+          { class: "separator w5" },
+          { class: "separator w5" },
+          { class: "separator w5" },
+          { label: "0", key: "0" },
+          { latex: "." },
+          { latex: "+" },
+          { class: "separator w5" },
+          { class: "separator w5" },
+          {
+            class: "action",
+            label: "<svg><use xlink:href='#svg-arrow-left' /></svg>",
+            command: ["performWithFeedback", "moveToPreviousChar"],
+          },
+          {
+            class: "action",
+            label: "<svg><use xlink:href='#svg-arrow-right' /></svg>",
+            command: ["performWithFeedback", "moveToNextChar"],
+          },
+          {
+            class: "action font-glyph bottom right",
+            label: "&#x232b;",
+            command: ["performWithFeedback", "deleteBackward"],
+          },
+        ],
+      ],
+    },
+  };
+  //defining a keyboard
+  const HIGH_SCHOOL_KEYBOARD = {
+    "custom-keyboard": {
+      // Label displayed in the Virtual Keyboard Switcher
+      label: "Keyboard",
+      // Tooltip when hovering over the label
+      tooltip: "Keyboard",
+      layer: "custom-keyboard-layer",
+    },
+  };
+  //getting the element references and configuring them to have the virtual keyboard
+  xInputGlobal.setOptions({
+    customVirtualKeyboardLayers: CUSTOM_KEYBOARD_LAYER,
+    customVirtualKeyboards: HIGH_SCHOOL_KEYBOARD,
+    virtualKeyboards: "custom-keyboard",
+    virtualKeyboardMode: "manual",
+    // virtualKeyboards: "numeric",
+  });
+  yInputGlobal.setOptions({
+    customVirtualKeyboardLayers: CUSTOM_KEYBOARD_LAYER,
+    customVirtualKeyboards: HIGH_SCHOOL_KEYBOARD,
+    virtualKeyboards: "custom-keyboard",
+    virtualKeyboardMode: "manual",
+    // virtualKeyboards: "numeric",
+  });
+
+  //converting xInputGlobal and yInputGlobal latex values to nerdamer string
+  xInputStringGlobal = nerdamer.convertFromLaTeX(xInputGlobal.value).text();
+  yInputStringGlobal = nerdamer.convertFromLaTeX(yInputGlobal.value).text();
+
+  //renders the flow field square, it's axis lines and labelling
+  renderOuterRectangle();
+  renderAxisLines();
+  axisLabelingHandler();
+
+  //calculating and highest magnitude
+  highestMagnitudeVectorGlobal = calculateHighestMagnitudeOfVector();
+  //plotting the individual vectors of the vector field
+  mainVectorFieldPlotter();
+  //rendering the coloured magnitude bar
+  magnitudeColourBarHandler(highestMagnitudeVectorGlobal);
+}
+
+
+
+
 
 //triggers on mouse click
 //calls isMouseClickedInside() and gets the coordinates
@@ -1097,252 +1374,6 @@ function mousePressed() {
         //dataStatus = false
         false
       );
-    }
-  }
-}
-
-//calculates P(x,y);Q(x,y);Magnitude;
-//calls divergence(); and curl(); and get their values
-function calculateAll(xAxis, yAxis) {
-  let x, y, pxy, qxy;
-  let magnitude;
-
-  if (displayBoxFlagGlobal === false) {
-    x = xAxis;
-    y = yAxis;
-  } else if (displayBoxFlagGlobal === true) {
-    x = Number(xCoord.value);
-    y = Number(yCoord.value);
-    if (Number.isNaN(x) || Number.isNaN(y)) {
-      modalBody.innerText = "Invalid Coordinate Input...";
-      modalHeader.innerHTML = "Error!";
-      modal.style.display = "block";
-      return false;
-    }
-  }
-
-  //calculating P(x,y) and Q(x,y)
-  try {
-    pxy = Number(nerdamer(xInputStringGlobal, { x: x, y: y }).evaluate());
-  } catch (err) {
-    pxy = "UNDEF";
-    magnitude = "UNDEF";
-  }
-  try {
-    qxy = Number(nerdamer(yInputStringGlobal, { x: x, y: y }).evaluate());
-  } catch (err) {
-    qxy = "UNDEF";
-    magnitude = "UNDEF";
-  }
-
-  //calculating magnitude
-  if (magnitude != "UNDEF") {
-    magnitude = Number(((pxy ** 2 + qxy ** 2) ** 0.5).toFixed(6));
-  }
-
-  let sqrtOfXInP = xInputStringGlobal.match(/sqrt\(x\)/g) || xInputStringGlobal.match(/x\^0.5/g);
-  let sqrtOfXInQ = yInputStringGlobal.match(/sqrt\(x\)/g) || yInputStringGlobal.match(/x\^0.5/g);
-  let sqrtOfYInP = xInputStringGlobal.match(/sqrt\(y\)/g) || xInputStringGlobal.match(/y\^0.5/g);
-  let sqrtOfYInQ = yInputStringGlobal.match(/sqrt\(y\)/g) || yInputStringGlobal.match(/y\^0.5/g);
-
-  let validityMessage = false;
-
-  if (sqrtOfXInP != null && x < 0) {
-    validityMessage = "P(x,y) is not valid at -x coordinate";
-  } else if (sqrtOfXInQ != null && x < 0) {
-    validityMessage = "Q(x,y) is not valid at -x coordinate";
-  } else if (sqrtOfYInP != null && y < 0) {
-    validityMessage = "P(x,y) is not valid at -y coordinate";
-  } else if (sqrtOfYInQ != null && y < 0) {
-    validityMessage = "Q(x,y) is not valid at -y coordinate";
-  }
-
-  if (validityMessage) {
-    modalBody.innerText = `${validityMessage}`;
-    modalHeader.innerHTML = "ATTENTION!";
-    modal.style.display = "block";
-    return false;
-  }
-
-  //for calculating curl and divergence, we are calling two different functions
-  let [divE, divV] = divergence(xAxis, yAxis);
-  let [curlE, curlV] = curl(xAxis, yAxis);
-
-  return [pxy, qxy, magnitude, curlE, curlV, divE, divV];
-}
-
-//calculates and return divergence equation and value
-function divergence(xAxis, yAxis) {
-  let divergenceVal;
-  let pDx, qDy;
-
-  //replacing sqrt(y) in xInputStringGlobal with P before derivative
-  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
-  let checkResultP = xInputStringGlobal.match(/sqrt\(y\)/g) || xInputStringGlobal.match(/y\^0.5/g);
-  if (checkResultP != null) {
-    let replacedXInputString = xInputStringGlobal.replace(/sqrt\(y\)/g, "P") || xInputStringGlobal.replace(/y\^0.5/g, "P");
-    //doing derivative
-    pDx = nerdamer.diff(replacedXInputString, "x");
-    //replacing P in pDy with sqrt(x) after derivative
-    pDx = pDx.text().replace(/P/g, "sqrt(y)");
-  } else {
-    pDx = nerdamer.diff(xInputStringGlobal, "x");
-  }
-
-  //replacing sqrt(x) in yInputStringGlobal with Q before derivative
-  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
-  let checkResultQ = yInputStringGlobal.match(/sqrt\(x\)/g);
-  if (checkResultQ != null) {
-    let replacedYInputString = yInputStringGlobal.replace(/sqrt\(x\)/g, "Q") || yInputStringGlobal.replace(/x\^0.5/g, "Q");
-    //doing derivative
-    qDy = nerdamer.diff(replacedYInputString, "y");
-    //replacing Q in qDy with sqrt(x) after derivative
-    qDy = qDy.text().replace(/Q/g, "sqrt(x)");
-  } else {
-    qDy = nerdamer.diff(yInputStringGlobal, "y");
-  }
-
-  //divergence equation
-  let divergenceEq = nerdamer(pDx).add(qDy);
-
-  //divergence value
-  try {
-    if (displayBoxFlagGlobal === true) {
-      divergenceVal = Number(
-        Number(
-          nerdamer(divergenceEq, {
-            x: xCoord.value,
-            y: yCoord.value,
-          }).evaluate()
-        ).toFixed(6)
-      );
-    } else if (displayBoxFlagGlobal === false) {
-      divergenceVal = Number(
-        Number(
-          nerdamer(divergenceEq, { x: xAxis, y: yAxis }).evaluate()
-        ).toFixed(6)
-      );
-    }
-  } catch (err) {
-    divergenceVal = "UNDEF";
-  }
-
-  return [divergenceEq, divergenceVal];
-}
-
-//calculates and return curl equation and value
-function curl(xAxis, yAxis) {
-  let pDy, qDx;
-  let curlVal;
-
-  //replacing sqrt(x) in xInputStringGlobal with P before derivative
-  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
-  let checkResultP = xInputStringGlobal.match(/sqrt\(x\)/g) || xInputStringGlobal.match(/x\^0.5/g);
-  if (checkResultP != null) {
-    let replacedXInputString = xInputStringGlobal.replace(/sqrt\(x\)/g, "P") || xInputStringGlobal.replace(/x\^0.5/g, "P");
-    //doing derivative
-    pDy = nerdamer.diff(replacedXInputString, "y");
-    //replacing P in pDy with sqrt(x) after derivative
-    pDy = pDy.text().replace(/P/g, "sqrt(x)");
-  } else {
-    pDy = nerdamer.diff(xInputStringGlobal, "y");
-  }
-
-  //replacing sqrt(y) in yInputStringGlobal with Q before derivative
-  //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
-  let checkResultQ = yInputStringGlobal.match(/sqrt\(y\)/g) || yInputStringGlobal.match(/y\^0.5/g);
-  if (checkResultQ != null) {
-    let replacedYInputString = yInputStringGlobal.replace(/sqrt\(y\)/g, "Q") || yInputStringGlobal.replace(/y\^0.5/g, "Q");
-    //doing derivative
-    qDx = nerdamer.diff(replacedYInputString, "x");
-    //replacing Q in qDx with sqrt(y) after derivative
-    qDx = qDx.text().replace(/Q/g, "sqrt(y)");
-  } else {
-    qDx = nerdamer.diff(yInputStringGlobal, "x");
-  }
-
-  //curl equation
-  let curlEq = nerdamer(qDx).subtract(pDy);
-
-  // curl value
-  try {
-    if (displayBoxFlagGlobal === true) {
-      curlVal = Number(
-        Number(
-          nerdamer(curlEq, {
-            x: xCoord.value,
-            y: yCoord.value,
-          }).evaluate()
-        ).toFixed(6)
-      );
-    } else if (displayBoxFlagGlobal === false) {
-      curlVal = Number(
-        Number(nerdamer(curlEq, { x: xAxis, y: yAxis }).evaluate()).toFixed(6)
-      );
-    }
-  } catch (err) {
-    curlVal = "UNDEF";
-  }
-
-  return [curlEq, curlVal];
-}
-
-//display the following data
-//(x,y);P(x,y);Q(x,y);Magnitude;Curl Eq;Curl Val;Divergence Eq;Divergence Val
-function displayAllData(
-  xAxis,
-  yAxis,
-  dataStatus,
-  pxy = null,
-  qxy = null,
-  magnitude = null,
-  curlE = null,
-  curlV = null,
-  divE = null,
-  divV = null
-) {
-  //if dataStatus true then only we have calculated values and we wanna show them otherwise don't
-  if (dataStatus === true) {
-    if (displayBoxFlagGlobal === false) {
-      coordDisplay.value = `\\left(x,y\\right)=\\left(${xAxis.toFixed(
-        3
-      )},${yAxis.toFixed(3)}\\right)`;
-    }
-    //if the custom coordinate check box is checked or enabled
-    //we have a flag variable to store the checkbox status
-    if (displayBoxFlagGlobal === true) {
-      coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
-    }
-    //displaying P(x,y) Q(x,y)
-    if (pxy === "UNDEF" || qxy === "UNDEF") {
-      pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy}`;
-      qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy}`;
-    } else {
-      pOfXy.value = `P\\left(x,y\\right)\\hat{i}=${pxy.toFixed(6)}`;
-      qOfXy.value = `Q\\left(x,y\\right)\\hat{j}=${qxy.toFixed(6)}`;
-    }
-    //displaying magnitude
-    magnitudeVal.value = `\\sqrt{P^2+Q^2}=${magnitude}`;
-    //displaying the curl equation by assigning it to proper DOM element
-    curlEqu.value = curlE.toTeX();
-    //displaying the div value by assigning it to proper DOM element
-    curlValue.value = `\\nabla\\times\\vec{F}=\\frac{\\partial Q}{\\partial x}-\\frac{\\partial P}{\\partial y}=
-    ${curlV}`;
-    //displaying the div equation by assigning it to proper DOM element
-    divEqu.value = divE.toTeX();
-    //displaying the divergence value by assigning it to proper DOM element
-    divValue.value = `\\nabla\\cdot\\vec{F}=\\frac{\\partial P}{\\partial x}+\\frac{\\partial Q}{\\partial y}=
-    {${divV}`;
-  } else {
-    if (displayBoxFlagGlobal === false) {
-      coordDisplay.value = `\\left(x,y\\right)=\\left(${xAxis.toFixed(
-        3
-      )},${yAxis.toFixed(3)}\\right)`;
-    }
-    //if the custom coordinate check box is checked or enabled
-    //we have a flag variable to store the checkbox status
-    if (displayBoxFlagGlobal === true) {
-      coordDisplay.value = `\\left(x,y\\right)=\\left(${xCoord.value},${yCoord.value}\\right)`;
     }
   }
 }
