@@ -523,7 +523,7 @@ function setup() {
   //Creating the canvas
   const customCanvas = createCanvas(1300, 700);
   customCanvas.style("z-index: -100");
-  customCanvas.position(0, 350);
+  customCanvas.position(0, 370);
 
   //translating the (0,0) to the centre of the canvas
   translate(width / 2, height / 2);
@@ -781,10 +781,10 @@ function mainVectorFieldPlotter() {
   ijValLow = 15 / divByijGlobal;
   ijValHigh = 15 / divByijGlobal;
 
-  let sqrtOfXInP = xInputStringGlobal.match(/sqrt\(x\)/g);
-  let sqrtOfXInQ = yInputStringGlobal.match(/sqrt\(x\)/g);
-  let sqrtOfYInP = xInputStringGlobal.match(/sqrt\(y\)/g);
-  let sqrtOfYInQ = yInputStringGlobal.match(/sqrt\(y\)/g);
+  let sqrtOfXInP = xInputStringGlobal.match(/sqrt\(x\)/g) || xInputStringGlobal.match(/x\^0.5/g);
+  let sqrtOfXInQ = yInputStringGlobal.match(/sqrt\(x\)/g) || yInputStringGlobal.match(/x\^0.5/g);
+  let sqrtOfYInP = xInputStringGlobal.match(/sqrt\(y\)/g) || xInputStringGlobal.match(/y\^0.5/g);
+  let sqrtOfYInQ = yInputStringGlobal.match(/sqrt\(y\)/g) || yInputStringGlobal.match(/y\^0.5/g);;
 
   let isValidPoint;
 
@@ -965,7 +965,7 @@ function submitButtonPressed() {
       scalingSliderSubmitHandler();
     }
     runTheCode();
-    window.scrollTo(0, 300);
+    window.scrollTo(0, 360);
     controlMenuBarChild.classList.remove("disable-div");
     return;
   } else {
@@ -1140,10 +1140,10 @@ function calculateAll(xAxis, yAxis) {
     magnitude = Number(((pxy ** 2 + qxy ** 2) ** 0.5).toFixed(6));
   }
 
-  let sqrtOfXInP = xInputStringGlobal.match(/sqrt\(x\)/g);
-  let sqrtOfXInQ = yInputStringGlobal.match(/sqrt\(x\)/g);
-  let sqrtOfYInP = xInputStringGlobal.match(/sqrt\(y\)/g);
-  let sqrtOfYInQ = yInputStringGlobal.match(/sqrt\(y\)/g);
+  let sqrtOfXInP = xInputStringGlobal.match(/sqrt\(x\)/g) || xInputStringGlobal.match(/x\^0.5/g);
+  let sqrtOfXInQ = yInputStringGlobal.match(/sqrt\(x\)/g) || yInputStringGlobal.match(/x\^0.5/g);
+  let sqrtOfYInP = xInputStringGlobal.match(/sqrt\(y\)/g) || xInputStringGlobal.match(/y\^0.5/g);
+  let sqrtOfYInQ = yInputStringGlobal.match(/sqrt\(y\)/g) || yInputStringGlobal.match(/y\^0.5/g);
 
   let validityMessage = false;
 
@@ -1178,9 +1178,9 @@ function divergence(xAxis, yAxis) {
 
   //replacing sqrt(y) in xInputStringGlobal with P before derivative
   //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
-  let checkResultP = xInputStringGlobal.match(/sqrt\(y\)/g);
+  let checkResultP = xInputStringGlobal.match(/sqrt\(y\)/g) || xInputStringGlobal.match(/y\^0.5/g);
   if (checkResultP != null) {
-    let replacedXInputString = xInputStringGlobal.replace(/sqrt\(y\)/g, "P");
+    let replacedXInputString = xInputStringGlobal.replace(/sqrt\(y\)/g, "P") || xInputStringGlobal.replace(/y\^0.5/g, "P");
     //doing derivative
     pDx = nerdamer.diff(replacedXInputString, "x");
     //replacing P in pDy with sqrt(x) after derivative
@@ -1193,7 +1193,7 @@ function divergence(xAxis, yAxis) {
   //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
   let checkResultQ = yInputStringGlobal.match(/sqrt\(x\)/g);
   if (checkResultQ != null) {
-    let replacedYInputString = yInputStringGlobal.replace(/sqrt\(x\)/g, "Q");
+    let replacedYInputString = yInputStringGlobal.replace(/sqrt\(x\)/g, "Q") || yInputStringGlobal.replace(/x\^0.5/g, "Q");
     //doing derivative
     qDy = nerdamer.diff(replacedYInputString, "y");
     //replacing Q in qDy with sqrt(x) after derivative
@@ -1237,9 +1237,9 @@ function curl(xAxis, yAxis) {
 
   //replacing sqrt(x) in xInputStringGlobal with P before derivative
   //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
-  let checkResultP = xInputStringGlobal.match(/sqrt\(x\)/g);
+  let checkResultP = xInputStringGlobal.match(/sqrt\(x\)/g) || xInputStringGlobal.match(/x\^0.5/g);
   if (checkResultP != null) {
-    let replacedXInputString = xInputStringGlobal.replace(/sqrt\(x\)/g, "P");
+    let replacedXInputString = xInputStringGlobal.replace(/sqrt\(x\)/g, "P") || xInputStringGlobal.replace(/x\^0.5/g, "P");
     //doing derivative
     pDy = nerdamer.diff(replacedXInputString, "y");
     //replacing P in pDy with sqrt(x) after derivative
@@ -1250,9 +1250,9 @@ function curl(xAxis, yAxis) {
 
   //replacing sqrt(y) in yInputStringGlobal with Q before derivative
   //Because nerdamer cannot handle sqrt() of any constant (which is not a number) in partial differentiation
-  let checkResultQ = yInputStringGlobal.match(/sqrt\(y\)/g);
+  let checkResultQ = yInputStringGlobal.match(/sqrt\(y\)/g) || yInputStringGlobal.match(/y\^0.5/g);
   if (checkResultQ != null) {
-    let replacedYInputString = yInputStringGlobal.replace(/sqrt\(y\)/g, "Q");
+    let replacedYInputString = yInputStringGlobal.replace(/sqrt\(y\)/g, "Q") || yInputStringGlobal.replace(/y\^0.5/g, "Q");
     //doing derivative
     qDx = nerdamer.diff(replacedYInputString, "x");
     //replacing Q in qDx with sqrt(y) after derivative

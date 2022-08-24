@@ -62,200 +62,203 @@
     <!-- ++++++++++++++ MAIN CONTAINER +++++++++ -->
     <!-- +++++++++++++++++++++++++++++++++++++++ -->
     <div id="main-div" style="display: none">
-      <!-- +++++++++++++++++++++++++++++++++++++++ -->
-      <!-- +++++++++++ TOP SUB-CONTAINER +++++++++ -->
-      <!-- +++++++++++++++++++++++++++++++++++++++ -->
-      <div id="top-container">
-        <!-- displaying the general vector function | F(x,y) = P(x,y) + Q(x,y) -->
-        <div id="vector-func-div" class="read-only-display">
-          <math-field
-            read-only
-            class="math-field-custom-style"
-            id="vector-func"
-          >
-            \vec{F}\left(x,y\right)=P\left(x,y\right)\hat{i}+Q\left(x,y\right)\hat{j}
-          </math-field>
-        </div>
+      <!-- =========================================================== -->
+      <div>
+        <!-- +++++++++++++++++++++++++++++++++++++++ -->
+        <!-- +++++++++++ TOP SUB-CONTAINER +++++++++ -->
+        <!-- +++++++++++++++++++++++++++++++++++++++ -->
+        <div id="top-container">
+          <!-- displaying the general vector function | F(x,y) = P(x,y) + Q(x,y) -->
+          <div id="vector-func-div" class="read-only-display">
+            <math-field
+              read-only
+              class="math-field-custom-style"
+              id="vector-func"
+            >
+              \vec{F}\left(x,y\right)=P\left(x,y\right)\hat{i}+Q\left(x,y\right)\hat{j}
+            </math-field>
+          </div>
 
-        <!-- user input field | P(x,y) | i-cap component -->
-        <div class="read-only-display" id="x-input-div">
-          <math-field id="x-input" class="math-field-custom-style"
-            >y</math-field
-          >
-        </div>
+          <!-- user input field | P(x,y) | i-cap component -->
+          <div class="read-only-display" id="x-input-div">
+            <math-field id="x-input" class="math-field-custom-style"
+              >y</math-field
+            >
+          </div>
 
-        <!-- user input field | Q(x,y) | j-cap component -->
-        <div class="read-only-display" id="y-input-div">
-          <math-field id="y-input" class="math-field-custom-style"
-            >x</math-field
-          >
-        </div>
+          <!-- user input field | Q(x,y) | j-cap component -->
+          <div class="read-only-display" id="y-input-div">
+            <math-field id="y-input" class="math-field-custom-style"
+              >x</math-field
+            >
+          </div>
 
-        <!-- submit button | after entering the user input -->
-        <div id="button-div" class="">
-          <button id="submit-btn">Submit</button>
+          <!-- submit button | after entering the user input -->
+          <div id="button-div" class="">
+            <button id="submit-btn">Submit</button>
+          </div>
         </div>
-      </div>
-      <!-- ============================================================================ -->
+        <!-- ============================================================================ -->
 
-      <!-- +++++++++++++++++++++++++++++++++++++++ -->
-      <!-- +++++++++++++ CONTROL MENU BAR ++++++++ -->
-      <!-- +++++++++++++++++++++++++++++++++++++++ -->
-      <div id="control-menu-bar">
-        <div id="control-menu-bar-child">
-          <!-- +++++++++++ SCALING ON OFF ++++++ -->
-          <div id="scale-on-off">
-            <div
-              id="scale-off-icon"
-              onclick="document.getElementById('scale-off-icon').style.display = 'none';
+        <!-- +++++++++++++++++++++++++++++++++++++++ -->
+        <!-- +++++++++++++ CONTROL MENU BAR ++++++++ -->
+        <!-- +++++++++++++++++++++++++++++++++++++++ -->
+        <div id="control-menu-bar">
+          <div id="control-menu-bar-child">
+            <!-- +++++++++++ SCALING ON OFF ++++++ -->
+            <div id="scale-on-off">
+              <div
+                id="scale-off-icon"
+                onclick="document.getElementById('scale-off-icon').style.display = 'none';
                   document.getElementById('scale-on-icon').style.display = 'block';"
-            ></div>
-            <div
-              id="scale-on-icon"
-              onclick="document.getElementById('scale-off-icon').style.display = 'block';
+              ></div>
+              <div
+                id="scale-on-icon"
+                onclick="document.getElementById('scale-off-icon').style.display = 'block';
                   document.getElementById('scale-on-icon').style.display = 'none';"
-            ></div>
-            <div id="scale-slider-div">
-              <input
-                id="scale-slider"
-                type="range"
-                min="0.01"
-                max="20"
-                value="10"
-                step="0.2"
-              />
+              ></div>
+              <div id="scale-slider-div">
+                <input
+                  id="scale-slider"
+                  type="range"
+                  min="0.01"
+                  max="20"
+                  value="10"
+                  step="0.2"
+                />
+              </div>
             </div>
-          </div>
-          <!-- +++++++++++ RECORD ON OFF ++++++ -->
-          <div id="record-on-off">
-            <div
-              id="record-off-icon"
-              onclick="document.getElementById('record-off-icon').style.display = 'none';
+            <!-- +++++++++++ RECORD ON OFF ++++++ -->
+            <div id="record-on-off">
+              <div
+                id="record-off-icon"
+                onclick="document.getElementById('record-off-icon').style.display = 'none';
           document.getElementById('record-on-icon').style.display = 'block';"
-            ></div>
-            <div
-              id="record-on-icon"
-              onclick="document.getElementById('record-off-icon').style.display = 'block';
+              ></div>
+              <div
+                id="record-on-icon"
+                onclick="document.getElementById('record-off-icon').style.display = 'block';
           document.getElementById('record-on-icon').style.display = 'none';"
-            ></div>
-          </div>
-          <!-- +++++++++++ CUSTOM COORDINATE ON OFF ++++++ -->
-          <div id="switch-on-off">
-            <div
-              id="switch-off-icon"
-              onclick="document.getElementById('switch-off-icon').style.display = 'none';
+              ></div>
+            </div>
+            <!-- +++++++++++ CUSTOM COORDINATE ON OFF ++++++ -->
+            <div id="switch-on-off">
+              <div
+                id="switch-off-icon"
+                onclick="document.getElementById('switch-off-icon').style.display = 'none';
           document.getElementById('switch-on-icon').style.display = 'block';"
-            ></div>
-            <div
-              id="switch-on-icon"
-              onclick="document.getElementById('switch-off-icon').style.display = 'block';
+              ></div>
+              <div
+                id="switch-on-icon"
+                onclick="document.getElementById('switch-off-icon').style.display = 'block';
           document.getElementById('switch-on-icon').style.display = 'none';"
-            ></div>
-          </div>
-          <!-- +++++++++++ ZOOMING ON OFF ++++++ -->
-          <div id="zoom-on-off">
-            <div
-              id="zoom-off-icon"
-              onclick="document.getElementById('zoom-off-icon').style.display = 'none';
+              ></div>
+            </div>
+            <!-- +++++++++++ ZOOMING ON OFF ++++++ -->
+            <div id="zoom-on-off">
+              <div
+                id="zoom-off-icon"
+                onclick="document.getElementById('zoom-off-icon').style.display = 'none';
           document.getElementById('zoom-on-icon').style.display = 'block';"
-            ></div>
-            <div
-              id="zoom-on-icon"
-              onclick="document.getElementById('zoom-off-icon').style.display = 'block';
+              ></div>
+              <div
+                id="zoom-on-icon"
+                onclick="document.getElementById('zoom-off-icon').style.display = 'block';
           document.getElementById('zoom-on-icon').style.display = 'none';"
-            ></div>
-            <div id="zoom-slider-div">
-              <input
-                id="zoom-slider"
-                type="range"
-                min="1"
-                max="8"
-                value="1"
-                step="1"
-              />
+              ></div>
+              <div id="zoom-slider-div">
+                <input
+                  id="zoom-slider"
+                  type="range"
+                  min="1"
+                  max="8"
+                  value="1"
+                  step="1"
+                />
+              </div>
             </div>
           </div>
         </div>
+        <!-- ================================================================================= -->
+
+        <!-- +++++++++++++++++++++++++++++++++++++++ -->
+        <!-- +++++++++++ BOTTOM SUB-CONTAINER ++++++ -->
+        <!-- +++++++++++++++++++++++++++++++++++++++ -->
+        <div id="bottom-container">
+          <!-- display this div when custom coordinate check box is checked else removed from DOM -->
+          <div class="width-bg" id="custom-coordinate-div">
+            <math-field id="custom-coordinate" class="width-margin" read-only>
+              \left(x,y\right)=
+            </math-field>
+            <span id="left-bracket">(</span>
+            <math-field id="x-coordinate">0</math-field>
+            <span id="comma">,</span>
+            <math-field id="y-coordinate">0</math-field>
+            <span id="right-bracket">)</span>
+          </div>
+
+          <!-- default display for coordinate -->
+          <div class="width-bg" id="coordinate-disp-div">
+            <math-field read-only class="width-margin" id="coordinate-disp">
+              \left(x,y\right)=\left(0,0\right)
+            </math-field>
+          </div>
+
+          <!-- value for P(x,y) -->
+          <div class="width-bg" id="p-of-xy-div">
+            <math-field read-only class="width-margin" id="p-of-xy"
+              >P\left(x,y\right)\hat{i}=0
+            </math-field>
+          </div>
+
+          <!-- value for Q(x,y) -->
+          <div class="width-bg" id="q-of-xy-div">
+            <math-field read-only class="width-margin" id="q-of-xy"
+              >Q\left(x,y\right)\hat{j}=0</math-field
+            >
+          </div>
+
+          <!-- value for Magnitude at a selected point -->
+          <div class="width-bg" id="magnitude-div">
+            <math-field read-only class="width-margin" id="magnitude"
+              >\sqrt{P^2+Q^2}=0</math-field
+            >
+          </div>
+
+          <!-- Curl equation display -->
+          <div class="width-bg" id="curl-equation-div">
+            <label id="curl-equation-label">Curl Expression:</label>
+            <math-field read-only class="width-margin" id="curl-equation"
+              >0</math-field
+            >
+          </div>
+
+          <!-- curl value display -->
+          <div class="width-bg" id="curl-value-div">
+            <math-field read-only class="width-margin" id="curl-value"
+              >\nabla\times\vec{F}=\frac{\partial Q}{\partial x}-\frac{\partial
+              P}{\partial y}=0
+            </math-field>
+          </div>
+
+          <!-- divergence equation display -->
+          <div class="width-bg" id="divergence-equation-div">
+            <label id="divergence-equation-label">Divergence Expression:</label>
+            <math-field read-only class="width-margin" id="divergence-equation"
+              >0</math-field
+            >
+          </div>
+
+          <!-- divergence value display -->
+          <div class="width-bg" id="divergence-value-div">
+            <math-field read-only class="width-margin" id="divergence-value"
+              >\nabla\cdot\vec{F}=\frac{\partial P}{\partial x}+\frac{\partial
+              Q}{\partial y}=0</math-field
+            >
+          </div>
+        </div>
+        <!-- ===================================================================== -->
       </div>
-      <!-- ================================================================================= -->
-
-      <!-- +++++++++++++++++++++++++++++++++++++++ -->
-      <!-- +++++++++++ BOTTOM SUB-CONTAINER ++++++ -->
-      <!-- +++++++++++++++++++++++++++++++++++++++ -->
-      <div id="bottom-container">
-        <!-- display this div when custom coordinate check box is checked else removed from DOM -->
-        <div class="width-bg" id="custom-coordinate-div">
-          <math-field id="custom-coordinate" class="width-margin" read-only>
-            \left(x,y\right)=
-          </math-field>
-          <span id="left-bracket">(</span>
-          <math-field id="x-coordinate">0</math-field>
-          <span id="comma">,</span>
-          <math-field id="y-coordinate">0</math-field>
-          <span id="right-bracket">)</span>
-        </div>
-
-        <!-- default display for coordinate -->
-        <div class="width-bg" id="coordinate-disp-div">
-          <math-field read-only class="width-margin" id="coordinate-disp">
-            \left(x,y\right)=\left(0,0\right)
-          </math-field>
-        </div>
-
-        <!-- value for P(x,y) -->
-        <div class="width-bg" id="p-of-xy-div">
-          <math-field read-only class="width-margin" id="p-of-xy"
-            >P\left(x,y\right)\hat{i}=0
-          </math-field>
-        </div>
-
-        <!-- value for Q(x,y) -->
-        <div class="width-bg" id="q-of-xy-div">
-          <math-field read-only class="width-margin" id="q-of-xy"
-            >Q\left(x,y\right)\hat{j}=0</math-field
-          >
-        </div>
-
-        <!-- value for Magnitude at a selected point -->
-        <div class="width-bg" id="magnitude-div">
-          <math-field read-only class="width-margin" id="magnitude"
-            >\sqrt{P^2+Q^2}=0</math-field
-          >
-        </div>
-
-        <!-- Curl equation display -->
-        <div class="width-bg" id="curl-equation-div">
-          <label id="curl-equation-label">Curl Expression:</label>
-          <math-field read-only class="width-margin" id="curl-equation"
-            >0</math-field
-          >
-        </div>
-
-        <!-- curl value display -->
-        <div class="width-bg" id="curl-value-div">
-          <math-field read-only class="width-margin" id="curl-value"
-            >\nabla\times\vec{F}=\frac{\partial Q}{\partial x}-\frac{\partial
-            P}{\partial y}=0
-          </math-field>
-        </div>
-
-        <!-- divergence equation display -->
-        <div class="width-bg" id="divergence-equation-div">
-          <label id="divergence-equation-label">Divergence Expression:</label>
-          <math-field read-only class="width-margin" id="divergence-equation"
-            >0</math-field
-          >
-        </div>
-
-        <!-- divergence value display -->
-        <div class="width-bg" id="divergence-value-div">
-          <math-field read-only class="width-margin" id="divergence-value"
-            >\nabla\cdot\vec{F}=\frac{\partial P}{\partial x}+\frac{\partial
-            Q}{\partial y}=0</math-field
-          >
-        </div>
-      </div>
-      <!-- ===================================================================== -->
     </div>
     <!-- ===================================================================== -->
 
@@ -271,6 +274,16 @@
         <p id="modal-text"></p>
       </div>
     </div>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <!-- +++++++++++ TOP ALERT BAR ++++++++ -->
+    <!-- +++++++++++++++++++++++++++++++++++++++ -->
+    <!-- <div class="alert info" id="info-div">
+      <span class="closebtn" id="info-close">&times;</span>
+      <strong>Info!</strong> This application is under development. Please feel
+      free to provide any feedback at
+      <a href="mailto: enwishacademy@gmail.com">enwishacademy@gmail.com</a>
+    </div> -->
+    <!-- =========================================================== -->
   </body>
-  <!-- =========================================================== -->
 </html>
