@@ -1,4 +1,4 @@
-# 2D_Vector_field_plotter_ [[Demo]](https://vector-field-plotter-e6668.web.app/)
+# VectorFieldPlotter [[Demo]](https://vector-field-plotter-e6668.web.app/)
 
 This application can plot vector field functions and it can also calculate different properties at various coordinate points on the field. It has additional features like increase field density, flexible upper and lower axis limit etc.  
 
